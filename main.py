@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Header, HTTPException
+from fastapi import FastAPI, Request, Header
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -9,7 +9,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-API_KEY = "123123123123 "
+
 HISTORY_FILE = "data/history.json"
 
 
@@ -43,8 +43,6 @@ def history_page(request: Request):
 
 @app.post("/api/predict")
 async def api_predict(data: dict, x_api_key: str = Header(None)):
-    if x_api_key != API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid API key")
 
     team1 = data.get("team1", [])
     team2 = data.get("team2", [])
