@@ -50,16 +50,11 @@ async function predictMatch() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-API-Key": "123123123123"
     },
     body: JSON.stringify({ team1, team2, team1_name, team2_name })
   });
 
   spinner.classList.add("hidden");
-  if (!res.ok) {
-    result.innerHTML = "<p class='error'>Ошибка: неверный API ключ</p>";
-    return;
-  }
 
   const data = await res.json();
   displayResult(data, team1_name, team2_name);
