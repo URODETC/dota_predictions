@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Предсказание матча</h1>
+
+<div class="teams-wrapper">
+  <div class="team">
+    <input id="team1-name" class="team-name" placeholder="Radiant" />
+    <h3>Герои Radiant</h3>
+    <div class="hero-pickers">
+      {% for i in range(5) %}
+      <div class="hero-slot">
+        <input class="hero-search" id="team1-{{ i }}" placeholder="Поиск героя..." oninput="searchHero(this, 'team1', {{ i }})">
+        <div class="search-results" id="team1-results-{{ i }}"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="team">
+    <input id="team2-name" class="team-name" placeholder="Dire" />
+    <h3>Герои Dire</h3>
+    <div class="hero-pickers">
+      {% for i in range(5) %}
+      <div class="hero-slot">
+        <input class="hero-search" id="team2-{{ i }}" placeholder="Поиск героя..." oninput="searchHero(this, 'team2', {{ i }})">
+        <div class="search-results" id="team2-results-{{ i }}"></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<button onclick="predictMatch()" id="predict-btn">🔮 Предсказать</button>
+<div id="spinner" class="spinner hidden"></div>
+
+<div id="result">
+  <div id="probability-bar" class="hidden">
+    <div id="radiant-bar" class="bar"></div>
+    <div id="dire-bar" class="bar"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', path='js/heroes.js') }}"></script>
+<script src="{{ url_for('static', path='js/script.js') }}"></script>
+{% endblock %}

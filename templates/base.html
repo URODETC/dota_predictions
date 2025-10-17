@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dota 2 Tools</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" data-tab="predict">🏆 Предсказание</a>
+      <a href="/last-pick" data-tab="last-pick">🎯 Ласт пик</a>
+      <a href="/history" data-tab="history">📊 История</a>
+    </nav>
+    <button id="theme-toggle">🌓</button>
+  </header>
+  <main class="fade-in">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) body.classList.add(savedTheme);
+
+    toggle.onclick = () => {
+      body.classList.toggle('light');
+      const theme = body.classList.contains('light') ? 'light' : 'dark';
+      localStorage.setItem('theme', theme);
+    };
+  </script>
+</body>
+</html>

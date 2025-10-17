@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>📜 История предсказаний</h1>
+<div id="stats"></div>
+<table id="history-table">
+  <thead>
+    <tr>
+      <th>Дата</th>
+      <th>Матч</th>
+      <th>Герои</th>
+      <th>Средняя</th>
+      <th>Early</th>
+      <th>Mid</th>
+      <th>Late</th>
+      <th>Минуты</th>
+      <th>Исход</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="{{ url_for('static', path='js/heroes.js') }}"></script>
+<script src="{{ url_for('static', path='js/history.js') }}"></script>
+{% endblock %}

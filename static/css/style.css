@@ -1,0 +1,334 @@
+/* 🎨 === ТЕМЫ === */
+:root {
+  --bg: #1b1b1b;
+  --text: #eaeaea;
+  --accent: #00aaff;
+  --card: #2a2a2a;
+  --good: #00ff7f;
+  --bad: #ff4040;
+  --border: #333;
+}
+
+body.light {
+  --bg: #f6f6f6;
+  --text: #111;
+  --accent: #0078d4;
+  --card: #ffffff;
+  --border: #ddd;
+}
+
+/* ⚙️ === ОСНОВА === */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
+}
+
+h1, h2, h3 {
+  text-align: center;
+  margin: 15px 0;
+  color: var(--text);
+}
+
+main {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* 🧭 === ХЭДЕР === */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+}
+
+nav a {
+  color: var(--text);
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: var(--accent);
+}
+
+#theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.3em;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+#theme-toggle:hover {
+  transform: rotate(25deg);
+}
+
+/* 📦 === КОНТЕЙНЕРЫ === */
+.teams-wrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.team {
+  flex: 1;
+  min-width: 300px;
+  background: var(--card);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* ✏️ === ПОЛЯ ВВОДА === */
+.team-name {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  color: var(--text);
+  margin-bottom: 10px;
+  font-size: 1em;
+}
+
+.team-name:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--accent);
+}
+
+/* 🔍 === ВЫБОР ГЕРОЕВ === */
+.hero-pickers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.hero-slot {
+  position: relative;
+}
+
+.hero-search {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.95em;
+}
+
+.hero-search::placeholder {
+  color: #888;
+}
+
+.hero-search:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--accent);
+}
+
+/* Результаты поиска */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  z-index: 30;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.hero-option {
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.hero-option:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.hero-icon-mini {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+/* 🔮 === КНОПКИ === */
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 10px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background: #0091ff;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* 🌀 === СПИННЕР === */
+.spinner {
+  width: 36px;
+  height: 36px;
+  margin: 10px auto;
+  border: 4px solid #444;
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 📊 === РЕЗУЛЬТАТ === */
+.result-card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.result-table th, .result-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px;
+  text-align: center;
+}
+
+/* 📈 === ПОЛОСА ВЕРОЯТНОСТЕЙ === */
+#probability-bar {
+  display: flex;
+  width: 100%;
+  height: 26px;
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #333;
+  font-size: 0.9em;
+  color: #fff;
+}
+
+#radiant-bar {
+  height: 100%;
+  background: var(--good);
+  text-align: center;
+  line-height: 26px;
+  white-space: nowrap;
+  transition: width 0.8s ease;
+}
+
+#dire-bar {
+  height: 100%;
+  background: var(--bad);
+  text-align: center;
+  line-height: 26px;
+  white-space: nowrap;
+  transition: width 0.8s ease;
+}
+
+/* 📜 === ТАБЛИЦА ИСТОРИИ === */
+#history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+#history-table th, #history-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px;
+  text-align: center;
+}
+
+#history-table tr.correct {
+  background: rgba(0, 255, 0, 0.1);
+}
+
+#history-table tr.wrong {
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.delete-btn {
+  background: none;
+  color: #ff4444;
+  font-size: 1.1em;
+}
+
+/* ⚙️ === АНИМАЦИИ === */
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 📱 === МОБИЛЬНАЯ АДАПТАЦИЯ === */
+@media (max-width: 700px) {
+  main { padding: 10px; }
+
+  h1, h2, h3 {
+    font-size: 1.2em;
+  }
+
+  .team {
+    min-width: 100%;
+    padding: 10px;
+  }
+
+  .hero-search {
+    font-size: 0.9em;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  #probability-bar {
+    font-size: 0.75em;
+  }
+
+  .hero-icon-mini {
+    width: 22px;
+    height: 22px;
+  }
+
+  table, td, th {
+    font-size: 0.8em;
+  }
+}
