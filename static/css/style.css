@@ -7,6 +7,8 @@
   --good: #00ff7f;
   --bad: #ff4040;
   --border: #333;
+  --result-bg: #1a1a1d;
+  --result-text: #f1f1f1;
 }
 
 body.light {
@@ -15,6 +17,8 @@ body.light {
   --accent: #0078d4;
   --card: #ffffff;
   --border: #ddd;
+  --result-bg: #ffffff;
+  --result-text: #111;
 }
 
 /* ⚙️ === ОСНОВА === */
@@ -163,7 +167,7 @@ nav a:hover {
 }
 
 .hero-option:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--text);
 }
 
 .hero-icon-mini {
@@ -173,25 +177,35 @@ nav a:hover {
 }
 
 /* 🔮 === КНОПКИ === */
+
 button {
-  background: var(--accent);
-  color: #fff;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
   border: none;
-  border-radius: 6px;
-  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--card);
+  background: var(--text);
   cursor: pointer;
-  font-size: 1em;
-  margin-top: 10px;
-  transition: background 0.2s, transform 0.1s;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
+
 button:hover {
-  background: #0091ff;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(197, 48, 48, 0.5);
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
+
+
 
 /* 🌀 === СПИННЕР === */
 .spinner {
@@ -213,11 +227,15 @@ button:active {
 
 /* 📊 === РЕЗУЛЬТАТ === */
 .result-card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 15px;
-  margin-top: 15px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  background: var(--result-bg);
+  color: var(--result-text);
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  font-family: "Inter", sans-serif;
+  max-width: 600px;
+  margin: 40px auto;
+  transition: background 0.3s, color 0.3s;
 }
 
 .result-table {
@@ -241,14 +259,14 @@ button:active {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid var(--border);
-  background: #333;
-  font-size: 0.9em;
-  color: #fff;
+  background: var(--card);   
+  font-size: 0.8em;
+  color: var(--text);
 }
 
 #radiant-bar {
   height: 100%;
-  background: var(--good);
+  background: var(--text);
   text-align: center;
   line-height: 26px;
   white-space: nowrap;
@@ -264,6 +282,24 @@ button:active {
   transition: width 0.8s ease;
 }
 
+#probability-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0,0,0,0.7);
+  pointer-events: none;
+  font-size: 0.95em;
+}
+
+
 /* 📜 === ТАБЛИЦА ИСТОРИИ === */
 #history-table {
   width: 100%;
@@ -278,11 +314,11 @@ button:active {
 }
 
 #history-table tr.correct {
-  background: rgba(0, 255, 0, 0.1);
+  background: var(--text);
 }
 
 #history-table tr.wrong {
-  background: rgba(255, 0, 0, 0.1);
+  background: var(--text);
 }
 
 .delete-btn {
