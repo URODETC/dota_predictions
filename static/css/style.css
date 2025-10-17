@@ -92,7 +92,7 @@ nav a:hover {
 
 /* ✏️ === ПОЛЯ ВВОДА === */
 .team-name {
-  width: 100%;
+  width: 95%;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid var(--accent);
@@ -105,6 +105,7 @@ nav a:hover {
 .team-name:focus {
   outline: none;
   box-shadow: 0 0 5px var(--accent);
+
 }
 
 /* 🔍 === ВЫБОР ГЕРОЕВ === */
@@ -126,6 +127,7 @@ nav a:hover {
   background: var(--card);
   color: var(--text);
   font-size: 0.95em;
+  box-sizing: border-box;
 }
 
 .hero-search::placeholder {
