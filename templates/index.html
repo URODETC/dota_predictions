@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <h1>Предсказание матча</h1>
 
 <div class="teams-wrapper">
@@ -9,8 +8,13 @@
     <div class="hero-pickers">
       {% for i in range(5) %}
       <div class="hero-slot">
-        <input class="hero-search" id="team1-{{ i }}" placeholder="Поиск героя..." oninput="searchHero(this, 'team1', {{ i }})">
-        <div class="search-results" id="team1-results-{{ i }}"></div>
+        <input
+          class="hero-search"
+          id="team1-{{ i }}"
+          placeholder="Поиск героя..."
+          oninput="searchHero(this, 'team1', {{ i }})"
+        />
+        <div class="search-results hidden" id="team1-results-{{ i }}"></div>
       </div>
       {% endfor %}
     </div>
@@ -22,15 +26,21 @@
     <div class="hero-pickers">
       {% for i in range(5) %}
       <div class="hero-slot">
-        <input class="hero-search" id="team2-{{ i }}" placeholder="Поиск героя..." oninput="searchHero(this, 'team2', {{ i }})">
-        <div class="search-results" id="team2-results-{{ i }}"></div>
+        <input
+          class="hero-search"
+          id="team2-{{ i }}"
+          placeholder="Поиск героя..."
+          oninput="searchHero(this, 'team2', {{ i }})"
+        />
+        <div class="search-results hidden" id="team2-results-{{ i }}"></div>
       </div>
       {% endfor %}
     </div>
   </div>
 </div>
-
-<button onclick="predictMatch()" id="predict-btn">🔮 Предсказать</button>
+<div class="predict-btn-wrapper">
+  <button onclick="predictMatch()" id="predict-btn">🔮 Предсказать</button>
+</div>
 <div id="spinner" class="spinner hidden"></div>
 
 <div id="result">

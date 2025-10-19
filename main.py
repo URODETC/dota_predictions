@@ -31,11 +31,6 @@ def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/last-pick", response_class=HTMLResponse)
-def last_pick(request: Request):
-    return templates.TemplateResponse("last_pick.html", {"request": request})
-
-
 @app.get("/history", response_class=HTMLResponse)
 def history_page(request: Request):
     return templates.TemplateResponse("history.html", {"request": request})
