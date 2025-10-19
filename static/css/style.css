@@ -245,6 +245,7 @@ nav a:hover {
 
 .selected-hero a {
   color: var(--text);
+  font-size: 15px;
   font-weight: 500;
   margin: 0 10px;
 }
