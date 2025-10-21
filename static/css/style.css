@@ -18,7 +18,8 @@
   --search-results-border: #2f2f33;
   --search-placeholder: #888; /* текст placeholder */
 
-  --predict-btn-bg: var(--accent);
+  --predict-btn-enabled: var(--accent);
+  --predict-btn-disabled: #606060;
   --predict-btn-text: #ffffff;
   --predict-btn-hover: color-mix(in srgb, var(--accent) 85%, white);
   --predict-btn-active: color-mix(in srgb, var(--accent) 70%, black);
@@ -52,7 +53,8 @@ body.light {
   --search-results-border: #ddd;
   --search-placeholder: #888;
 
-  --predict-btn-bg: var(--accent);
+  --predict-btn-enabled: var(--accent);
+  --predict-btn-disabled: #606060;
   --predict-btn-text: #ffffff;
   --predict-btn-hover: color-mix(in srgb, var(--accent) 80%, white);
   --predict-btn-active: color-mix(in srgb, var(--accent) 65%, black);
@@ -299,21 +301,25 @@ nav a:hover {
   font-size: 18px;
   font-weight: 600;
   color: var(--predict-btn-text);
-  background: var(--predict-btn-bg);
-  cursor: pointer;
+  background: var(--predict-btn-disabled);
   overflow: hidden;
+}
+
+#predict-btn.enabled {
+  cursor: pointer;
+  background: var(--predict-btn-enabled);
   transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
     color 0.3s;
   box-shadow: 0 0 10px var(--predict-btn-shadow);
 }
 
-#predict-btn:hover {
+#predict-btn:hover.enabled {
   background: var(--predict-btn-hover);
   transform: scale(1.05);
   box-shadow: 0 0 16px var(--predict-btn-shadow);
 }
 
-#predict-btn:active {
+#predict-btn:active.enabled {
   background: var(--predict-btn-active);
   transform: scale(0.97);
 }

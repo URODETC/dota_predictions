@@ -5,8 +5,23 @@
 // TODO: Добавить в нейронку не только early, mid, late, а больше значений (промежутками по 5 минут) или как-то заставлять выводить ее время матча
 // TODO: докинуть новые данные в датасет
 // TODO: построить график преимущества команды от вермени
-
+// TODO: Добавить проверку героев на повторы
+// TODO: Добавить инфу о сайте снизу
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
+
+function enableButton() {
+  const button = document.getElementById('predict-btn');
+  const team1 = selectedHeroes.team1.filter(x => x !== null);
+  const team2 = selectedHeroes.team2.filter(x => x !== null);
+  if (team1.length == 5 && team2.length == 5){
+    button.classList.add('enabled');
+    button.disabled = false
+  }
+  else {
+    button.classList.remove('enabled');
+    button.disabled = true
+  }
+}
 
 function searchHero(input, team, index) {
   const query = input.value.toLowerCase().trim();
@@ -32,21 +47,22 @@ function searchHero(input, team, index) {
 
 function selectHero(hero, team, index, input, resultsDiv) {
   selectedHeroes[team][index] = hero.id;
-  input.classList.add('hidden')
-  const div = document.createElement('div')
+  input.classList.add('hidden');
+  const div = document.createElement('div');
   div.className = "selected-hero";
-  div.innerHTML = `<div class="hero-name"><img src="${hero.icon}" class="hero-icon-medium"> <a>${hero.name}</a></div> <button id="clear-hero-btn" onclick="clearHero(this)">X</button>`
-  input.parentElement.appendChild(div)
+  div.innerHTML = `<div class="hero-name"><img src="${hero.icon}" class="hero-icon-medium"> <a>${hero.name}</a></div> <button id="clear-hero-btn" onclick="clearHero(this)">X</button>`;
+  input.parentElement.appendChild(div);
   input.value = "";
   resultsDiv.innerHTML = "";
-  resultsDiv.classList.add('hidden')
-  resultsDiv.parentElement.classList.remove('active')
+  resultsDiv.classList.add('hidden');
+  resultsDiv.parentElement.classList.remove('active');
+  enableButton()
 }
 
 function clearHero(element){
-  heroSlot = element.parentElement.parentElement
-  heroSlot.getElementsByClassName("selected-hero")[0].remove()
-  heroSlot.getElementsByClassName("hero-search")[0].classList.remove('hidden')
+  heroSlot = element.parentElement.parentElement;
+  heroSlot.getElementsByClassName("selected-hero")[0].remove();
+  heroSlot.getElementsByClassName("hero-search")[0].classList.remove('hidden');
 }
 
 async function predictMatch() {
@@ -56,12 +72,6 @@ async function predictMatch() {
 
   const team1 = selectedHeroes.team1.filter(x => x !== null);
   const team2 = selectedHeroes.team2.filter(x => x !== null);
-
-  if (team1.length < 5 || team2.length < 5) {
-    spinner.classList.add("hidden");
-    result.innerHTML = `<p class='error'>Выбери по 5 героев в каждую команду!</p>`;
-    return;
-  }
 
   const team1_name = document.getElementById("team1-name").value || "Radiant";
   const team2_name = document.getElementById("team2-name").value || "Dire";
