@@ -7,6 +7,7 @@
 // TODO: построить график преимущества команды от вермени
 // TODO: Добавить проверку героев на повторы
 // TODO: Добавить инфу о сайте снизу
+// TODO: Добавить кнопку "Очистить" героев
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
 
 function enableButton() {
@@ -15,11 +16,11 @@ function enableButton() {
   const team2 = selectedHeroes.team2.filter(x => x !== null);
   if (team1.length == 5 && team2.length == 5){
     button.classList.add('enabled');
-    button.disabled = false
+    button.disabled = false;
   }
   else {
     button.classList.remove('enabled');
-    button.disabled = true
+    button.disabled = true;
   }
 }
 
@@ -63,6 +64,14 @@ function clearHero(element){
   heroSlot = element.parentElement.parentElement;
   heroSlot.getElementsByClassName("selected-hero")[0].remove();
   heroSlot.getElementsByClassName("hero-search")[0].classList.remove('hidden');
+  team = heroSlot.getElementsByClassName("hero-search")[0].id.slice(0,5);
+  index = heroSlot.getElementsByClassName("hero-search")[0].id[6];
+  selectedHeroes[team][index] = null;
+  enableButton();
+  result = document.getElementById('result');
+  if (result.classList.contains('hidden') == false) {
+    clearResult();
+  }
 }
 
 async function predictMatch() {
@@ -87,6 +96,7 @@ async function predictMatch() {
   spinner.classList.add("hidden");
 
   const data = await res.json();
+  enableButton();
   displayResult(data, team1_name, team2_name);
 }
 
@@ -94,12 +104,11 @@ function displayResult(data, team1_name, team2_name) {
   const result = document.getElementById("result");
   const radiant = data.average.radiant;
   const dire = data.average.dire;
-
   const radiantBar = document.getElementById("radiant-bar");
   const direBar = document.getElementById("dire-bar");
-  const barContainer = document.getElementById("probability-bar");
 
-  barContainer.classList.remove("hidden");
+  result.classList.remove('hidden')
+
   radiantBar.style.width = radiant + "%";
   direBar.style.width = dire + "%";
   radiantBar.textContent = `${team1_name}: ${radiant}%`;
@@ -120,4 +129,10 @@ function displayResult(data, team1_name, team2_name) {
       </table>
     </div>
   `;
+}
+
+
+function clearResult() {
+  const result = document.getElementById('result');
+  result.classList.add('hidden');
 }
