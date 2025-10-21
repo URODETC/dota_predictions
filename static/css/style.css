@@ -314,11 +314,11 @@ button:active {
 }
 
 #history-table tr.correct {
-  background: var(--text);
+  background: var(--good);
 }
 
 #history-table tr.wrong {
-  background: var(--text);
+  background: var(--bad);
 }
 
 .delete-btn {
