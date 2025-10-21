@@ -20,7 +20,7 @@ async function loadHistory() {
     tr.innerHTML = `
       <td>${match.timestamp}</td>
       <td>${match.team1} vs ${match.team2}</td>
-      <td>${icons(match.team1_heroes)} — ${icons(match.team2_heroes)}</td>
+      <td>${icons(match.team1_heroes)} / ${icons(match.team2_heroes)}</td>
       <td>${match.result.average.radiant}% / ${match.result.average.dire}%</td>
       <td>${match.result.early_game.radiant}% / ${match.result.early_game.dire}%</td>
       <td>${match.result.mid_game.radiant}% / ${match.result.mid_game.dire}%</td>

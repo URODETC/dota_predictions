@@ -9,7 +9,6 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-
 HISTORY_FILE = "data/history.json"
 
 
@@ -29,11 +28,6 @@ def save_history(data):
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
-
-@app.get("/last-pick", response_class=HTMLResponse)
-def last_pick(request: Request):
-    return templates.TemplateResponse("last_pick.html", {"request": request})
 
 
 @app.get("/history", response_class=HTMLResponse)

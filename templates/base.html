@@ -7,10 +7,9 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
 </head>
 <body>
-  <header>
+  <header class="fade-in">
     <nav>
       <a href="/" data-tab="predict">🏆 Предсказание</a>
-      <a href="/last-pick" data-tab="last-pick">🎯 Ласт пик</a>
       <a href="/history" data-tab="history">📊 История</a>
     </nav>
     <button id="theme-toggle">🌓</button>
@@ -27,7 +26,7 @@
 
     toggle.onclick = () => {
       body.classList.toggle('light');
-      const theme = body.classList.contains('light') ? 'light' : 'dark';
+      const theme = body.classList.contains('light') ? 'light' : '';
       localStorage.setItem('theme', theme);
     };
   </script>

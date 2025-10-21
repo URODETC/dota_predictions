@@ -1,27 +1,71 @@
-/* 🎨 === ТЕМЫ === */
+/* тема */
 :root {
-  --bg: #1b1b1b;
-  --text: #eaeaea;
-  --accent: #00aaff;
-  --card: #2a2a2a;
-  --good: #00ff7f;
-  --bad: #ff4040;
-  --border: #333;
-  --result-bg: #1a1a1d;
-  --result-text: #f1f1f1;
+  --bg: #121212; /* фон страницы */
+  --card: #1e1e1e; /* карточки, панели */
+  --border: #2b2b2b; /* границы */
+  --text: #e0e0e0; /* основной текст */
+  --text-muted: #aaaaaa; /* второстепенный текст */
+  --accent: #00aaff; /* акцент — ссылки, кнопки */
+  --good: #00ff9d; /* позитив */
+  --bad: #ff4040; /* негатив */
+  --result-bg: #18181b; /* фон блока результатов */
+  --result-text: #f1f1f1; /* текст результата */
+
+  --search-bg: #1f1f22; /* фон поля */
+  --search-border: #2f2f33; /* граница */
+  --search-hover: #32323a; /* hover в списке */
+  --search-results-bg: #26262b; /* фон выпадающего списка */
+  --search-results-border: #2f2f33;
+  --search-placeholder: #888; /* текст placeholder */
+
+  --predict-btn-bg: var(--accent);
+  --predict-btn-text: #ffffff;
+  --predict-btn-hover: color-mix(in srgb, var(--accent) 85%, white);
+  --predict-btn-active: color-mix(in srgb, var(--accent) 70%, black);
+  --predict-btn-shadow: rgba(0, 170, 255, 0.4);
+
+  --clear-btn-bg: #ff4040;
+  --clear-btn-text: #ffffff;
+  --clear-btn-hover: color-mix(in srgb, var(--clear-btn-bg) 85%, white);
+  --clear-btn-active: color-mix(in srgb, var(--clear-btn-bg) 70%, black);
+  --clear-btn-shadow: rgba(255, 64, 64, 0.4);
 }
 
 body.light {
-  --bg: #f6f6f6;
-  --text: #111;
-  --accent: #0078d4;
-  --card: #ffffff;
-  --border: #ddd;
-  --result-bg: #ffffff;
-  --result-text: #111;
+  --bg: #f7f7f9; /* общий фон */
+  --card: #ffffff; /* блоки */
+  --border: #dddddd; /* границы */
+  --text: #1a1a1a; /* текст */
+  --text-muted: #555555; /* второстепенный текст */
+  --accent: #0078d4; /* акцент (совпадает с тёмной темой для консистентности) */
+
+  --good: #00c97c;
+  --bad: #e63946;
+
+  --result-bg: #fafafa;
+  --result-text: #1a1a1a;
+
+  --search-bg: #fefefe;
+  --search-border: #ccc;
+  --search-hover: #f0f7ff;
+  --search-results-bg: #ffffff;
+  --search-results-border: #ddd;
+  --search-placeholder: #888;
+
+  --predict-btn-bg: var(--accent);
+  --predict-btn-text: #ffffff;
+  --predict-btn-hover: color-mix(in srgb, var(--accent) 80%, white);
+  --predict-btn-active: color-mix(in srgb, var(--accent) 65%, black);
+  --predict-btn-shadow: rgba(0, 120, 212, 0.3);
+
+  --clear-btn-bg: #ff4040;
+  --clear-btn-text: #ffffff;
+  --clear-btn-hover: color-mix(in srgb, var(--predict-btn-bg) 80%, white);
+  --clear-btn-active: color-mix(in srgb, var(--predict-btn-bg) 65%, black);
+  --clear-btn-shadow: rgba(255, 64, 64, 0.3);
 }
 
-/* ⚙️ === ОСНОВА === */
+/* основа */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -31,7 +75,9 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   text-align: center;
   margin: 15px 0;
   color: var(--text);
@@ -43,14 +89,14 @@ main {
   margin: auto;
 }
 
-/* 🧭 === ХЭДЕР === */
+/* навбар */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
+  background: var(--bg);
   padding: 10px 20px;
+  transition: background 0.3s, color 0.3s;
 }
 
 nav a {
@@ -77,7 +123,7 @@ nav a:hover {
   transform: rotate(25deg);
 }
 
-/* 📦 === КОНТЕЙНЕРЫ === */
+/* враперы */
 .teams-wrapper {
   display: flex;
   justify-content: space-around;
@@ -91,28 +137,37 @@ nav a:hover {
   background: var(--card);
   border-radius: 10px;
   padding: 15px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-/* ✏️ === ПОЛЯ ВВОДА === */
+.predict-btn-wrapper {
+  padding: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+/* инпуты */
 .team-name {
   width: 95%;
   padding: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--accent);
-  background: var(--bg);
+  background: var(--search-bg);
+  border-radius: 6px;
+  border: 1px solid var(--search-border);
   color: var(--text);
   margin-bottom: 10px;
   font-size: 1em;
 }
 
-.team-name:focus {
-  outline: none;
-  box-shadow: 0 0 5px var(--accent);
-
+.team-name::placeholder {
+  color: var(--search-placeholder);
 }
 
-/* 🔍 === ВЫБОР ГЕРОЕВ === */
+.team-name:focus {
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 60%, transparent);
+  border-color: var(--accent);
+}
+
+/* hero pickers */
 .hero-pickers {
   display: grid;
   grid-template-columns: 1fr;
@@ -121,64 +176,119 @@ nav a:hover {
 
 .hero-slot {
   position: relative;
+  z-index: 1;
+}
+
+.hero-slot.active {
+  z-index: 50;
 }
 
 .hero-search {
   width: 100%;
   padding: 8px 10px;
   border-radius: 6px;
-  border: 1px solid var(--accent);
-  background: var(--card);
+  border: 1px solid var(--search-border);
+  background: var(--search-bg);
   color: var(--text);
   font-size: 0.95em;
   box-sizing: border-box;
 }
 
 .hero-search::placeholder {
-  color: #888;
+  color: var(--search-placeholder);
 }
 
 .hero-search:focus {
-  outline: none;
-  box-shadow: 0 0 5px var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
-/* Результаты поиска */
+/* результаты поиска */
 .search-results {
   position: absolute;
   top: 100%;
   left: 0;
   width: 100%;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  z-index: 30;
+  background: var(--search-results-bg);
+  border: 1px solid var(--search-results-border);
   max-height: 180px;
-  overflow-y: auto;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  overflow-y: hidden;
 }
 
 .hero-option {
+  color: var(--text);
   padding: 6px 8px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .hero-option:hover {
-  background: var(--text);
+  background: var(--search-hover);
+}
+
+.selected-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  border: 1px solid var(--search-border);
+  background-color: var(--search-bg);
+}
+
+.hero-name {
+  display: flex;
+  align-items: center;
+}
+
+.selected-hero a {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 10px;
+}
+
+#clear-hero-btn {
+  border-radius: 6px;
+  width: 40px;
+  font-weight: 550;
+  border: none;
+  font-size: 19px;
+  color: var(--clear-btn-text);
+  background-color: var(--clear-btn-bg);
+  cursor: pointer;
+  margin-right: 10px;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
+    color 0.3s;
+  box-shadow: 0 0 10px var(--clear-btn-shadow);
+}
+
+#clear-hero-btn:hover {
+  background: var(--clear-btn-hover);
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--clear-btn-shadow);
+}
+
+#clear-hero-btn:active {
+  background: var(--clear-btn-active);
+  transform: scale(0.97);
 }
 
 .hero-icon-mini {
-  width: 26px;
   height: 26px;
   border-radius: 6px;
 }
 
-/* 🔮 === КНОПКИ === */
+.hero-icon-medium {
+  height: 35px;
+  border-radius: 6px;
+}
 
-button {
+/*predict button*/
+
+#predict-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -188,26 +298,27 @@ button {
   border-radius: 12px;
   font-size: 18px;
   font-weight: 600;
-  color: var(--card);
-  background: var(--text);
+  color: var(--predict-btn-text);
+  background: var(--predict-btn-bg);
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
+    color 0.3s;
+  box-shadow: 0 0 10px var(--predict-btn-shadow);
 }
 
-
-button:hover {
+#predict-btn:hover {
+  background: var(--predict-btn-hover);
   transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(197, 48, 48, 0.5);
+  box-shadow: 0 0 16px var(--predict-btn-shadow);
 }
 
-button:active {
-  transform: scale(0.98);
+#predict-btn:active {
+  background: var(--predict-btn-active);
+  transform: scale(0.97);
 }
 
-
-
-/* 🌀 === СПИННЕР === */
+/* спинер(зач?) */
 .spinner {
   width: 36px;
   height: 36px;
@@ -217,21 +328,20 @@ button:active {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
-.hidden {
-  display: none;
-}
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* 📊 === РЕЗУЛЬТАТ === */
+/* result */
 .result-card {
   background: var(--result-bg);
   color: var(--result-text);
   padding: 20px 24px;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   font-family: "Inter", sans-serif;
   max-width: 600px;
   margin: 40px auto;
@@ -244,13 +354,13 @@ button:active {
   margin-top: 10px;
 }
 
-.result-table th, .result-table td {
-  border-bottom: 1px solid var(--border);
+.result-table th,
+.result-table td {
   padding: 6px;
   text-align: center;
 }
 
-/* 📈 === ПОЛОСА ВЕРОЯТНОСТЕЙ === */
+/* propability bar */
 #probability-bar {
   display: flex;
   width: 100%;
@@ -258,8 +368,7 @@ button:active {
   margin: 10px 0;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--card);   
+  background: var(--bg-3);
   font-size: 0.8em;
   color: var(--text);
 }
@@ -294,21 +403,20 @@ button:active {
   padding: 0 10px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 0 5px rgba(0,0,0,0.7);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
   pointer-events: none;
   font-size: 0.95em;
 }
 
-
-/* 📜 === ТАБЛИЦА ИСТОРИИ === */
+/* history tables */
 #history-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
 }
 
-#history-table th, #history-table td {
-  border-bottom: 1px solid var(--border);
+#history-table th,
+#history-table td {
   padding: 6px;
   text-align: center;
 }
@@ -327,20 +435,34 @@ button:active {
   font-size: 1.1em;
 }
 
-/* ⚙️ === АНИМАЦИИ === */
+/* анимации */
 .fade-in {
   animation: fadeIn 0.4s ease-in;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* 📱 === МОБИЛЬНАЯ АДАПТАЦИЯ === */
-@media (max-width: 700px) {
-  main { padding: 10px; }
+.hidden {
+  display: none !important;
+}
 
-  h1, h2, h3 {
+/* mobile */
+@media (max-width: 700px) {
+  main {
+    padding: 10px;
+  }
+
+  h1,
+  h2,
+  h3 {
     font-size: 1.2em;
   }
 
@@ -366,7 +488,9 @@ button:active {
     height: 22px;
   }
 
-  table, td, th {
+  table,
+  td,
+  th {
     font-size: 0.8em;
   }
 }
