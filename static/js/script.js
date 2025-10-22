@@ -7,8 +7,9 @@
 // TODO: построить график преимущества команды от вермени
 // TODO: Добавить проверку героев на повторы
 // TODO: Добавить инфу о сайте снизу
-// TODO: Добавить кнопку "Очистить" героев
+// TODO: Анимировать кнопку "Очистить" 
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
+let lastPrediction = null;
 
 function enableButton() {
   const button = document.getElementById('predict-btn');
@@ -22,6 +23,24 @@ function enableButton() {
     button.classList.remove('enabled');
     button.disabled = true;
   }
+}
+
+function clearButton() {
+  document.getElementById("clear-all-btn").addEventListener("click", () => {
+    document.querySelectorAll(".team-name").forEach(input => (input.value = ""));
+    document.querySelectorAll(".hero-slot").forEach(slot => {
+      const selected = slot.querySelector(".selected-hero");
+      const input = slot.querySelector(".hero-search");
+      if (selected) selected.remove();
+      if (input) input.classList.remove("hidden");
+    });
+    selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
+    const resultCard = document.getElementById("result");
+    if (resultCard) resultCard.classList.add("hidden");
+    const predictBtn = document.getElementById("predict-btn");
+    predictBtn.classList.remove("enabled");
+    predictBtn.disabled = true;
+  });
 }
 
 function searchHero(input, team, index) {
@@ -85,6 +104,15 @@ async function predictMatch() {
   const team1_name = document.getElementById("team1-name").value || "Radiant";
   const team2_name = document.getElementById("team2-name").value || "Dire";
 
+  const currentPrediction = JSON.stringify({ team1, team2, team1_name, team2_name });
+
+  if (currentPrediction === lastPrediction) {
+    spinner.classList.add("hidden");
+    return;
+  }
+
+   lastPrediction = currentPrediction;
+
   const res = await fetch("/api/predict", {
     method: "POST",
     headers: {
@@ -136,3 +164,4 @@ function clearResult() {
   const result = document.getElementById('result');
   result.classList.add('hidden');
 }
+clearButton();

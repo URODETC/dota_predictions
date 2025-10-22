@@ -288,6 +288,21 @@ nav a:hover {
   border-radius: 6px;
 }
 
+.predict-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: -50px;
+}
+
+.clear-all-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1000px;
+  margin: 10px auto 0;
+  padding-right: 20px;
+}
+
+
 /*predict button*/
 
 #predict-btn {
@@ -321,6 +336,34 @@ nav a:hover {
 
 #predict-btn:active.enabled {
   background: var(--predict-btn-active);
+  transform: scale(0.97);
+}
+
+/* Очистка кнопка */
+
+#clear-all-btn {
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  color: var(--clear-btn-text);
+  background-color: var(--clear-btn-bg);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
+    color 0.3s;
+  box-shadow: 0 0 10px var(--clear-btn-shadow);
+  margin-left: 15px; /* смещаем правее от центра */
+}
+
+#clear-all-btn:hover {
+  background: var(--clear-btn-hover);
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--clear-btn-shadow);
+}
+
+#clear-all-btn:active {
+  background: var(--clear-btn-active);
   transform: scale(0.97);
 }
 
@@ -376,7 +419,7 @@ nav a:hover {
   overflow: hidden;
   background: var(--bg-3);
   font-size: 0.8em;
-  color: var(--text);
+  color: black;
 }
 
 #radiant-bar {
