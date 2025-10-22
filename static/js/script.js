@@ -7,7 +7,6 @@
 // TODO: построить график преимущества команды от вермени
 // TODO: Добавить проверку героев на повторы
 // TODO: Добавить инфу о сайте снизу
-// TODO: Анимировать кнопку "Очистить"
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
 let lastPrediction = null;
 
