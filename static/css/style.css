@@ -25,10 +25,11 @@
   --predict-btn-active: color-mix(in srgb, var(--accent) 70%, black);
   --predict-btn-shadow: rgba(0, 170, 255, 0.4);
 
-  --clear-btn-bg: #ff4040;
+  --clear-btn-enabled: #ff4040;
+  --clear-btn-disabled: #606060;
   --clear-btn-text: #ffffff;
-  --clear-btn-hover: color-mix(in srgb, var(--clear-btn-bg) 85%, white);
-  --clear-btn-active: color-mix(in srgb, var(--clear-btn-bg) 70%, black);
+  --clear-btn-hover: color-mix(in srgb, var(--clear-btn-enabled) 85%, white);
+  --clear-btn-active: color-mix(in srgb, var(--clear-btn-enabled) 70%, black);
   --clear-btn-shadow: rgba(255, 64, 64, 0.4);
 }
 
@@ -60,7 +61,8 @@ body.light {
   --predict-btn-active: color-mix(in srgb, var(--accent) 65%, black);
   --predict-btn-shadow: rgba(0, 120, 212, 0.3);
 
-  --clear-btn-bg: #ff4040;
+  --clear-btn-enabled: #ff4040;
+  --clear-btn-disabled: #606060;
   --clear-btn-text: #ffffff;
   --clear-btn-hover: color-mix(in srgb, var(--predict-btn-bg) 80%, white);
   --clear-btn-active: color-mix(in srgb, var(--predict-btn-bg) 65%, black);
@@ -259,7 +261,7 @@ nav a:hover {
   border: none;
   font-size: 19px;
   color: var(--clear-btn-text);
-  background-color: var(--clear-btn-bg);
+  background-color: var(--clear-btn-enabled);
   cursor: pointer;
   margin-right: 10px;
   transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
@@ -348,21 +350,25 @@ nav a:hover {
   font-weight: 600;
   border: none;
   color: var(--clear-btn-text);
-  background-color: var(--clear-btn-bg);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
-    color 0.3s;
-  box-shadow: 0 0 10px var(--clear-btn-shadow);
+  background-color: var(--clear-btn-disabled);
   margin-left: 15px; /* смещаем правее от центра */
 }
 
-#clear-all-btn:hover {
+#clear-all-btn.enabled {
+  cursor: pointer;
+  background-color: var(--clear-btn-enabled);
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.3s,
+    color 0.3s;
+  box-shadow: 0 0 10px var(--clear-btn-shadow);
+}
+
+#clear-all-btn:hover.enabled {
   background: var(--clear-btn-hover);
   transform: scale(1.05);
   box-shadow: 0 0 16px var(--clear-btn-shadow);
 }
 
-#clear-all-btn:active {
+#clear-all-btn:active.enabled {
   background: var(--clear-btn-active);
   transform: scale(0.97);
 }

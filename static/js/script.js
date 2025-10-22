@@ -7,56 +7,68 @@
 // TODO: построить график преимущества команды от вермени
 // TODO: Добавить проверку героев на повторы
 // TODO: Добавить инфу о сайте снизу
-// TODO: Анимировать кнопку "Очистить" 
+// TODO: Анимировать кнопку "Очистить"
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
 let lastPrediction = null;
 
-function enableButton() {
-  const button = document.getElementById('predict-btn');
-  const team1 = selectedHeroes.team1.filter(x => x !== null);
-  const team2 = selectedHeroes.team2.filter(x => x !== null);
-  if (team1.length == 5 && team2.length == 5){
-    button.classList.add('enabled');
+function predictButtonState() {
+  const button = document.getElementById("predict-btn");
+  const team1 = selectedHeroes.team1.filter((x) => x !== null);
+  const team2 = selectedHeroes.team2.filter((x) => x !== null);
+  if (team1.length == 5 && team2.length == 5) {
+    button.classList.add("enabled");
     button.disabled = false;
+  } else {
+    button.classList.remove("enabled");
+    button.disabled = true;
   }
-  else {
-    button.classList.remove('enabled');
+}
+
+function clearButtonState() {
+  const team1 = selectedHeroes.team1.filter((x) => x !== null);
+  const team2 = selectedHeroes.team2.filter((x) => x !== null);
+  const button = document.getElementById("clear-all-btn");
+
+  if (team1.length != 0 || team2.length != 0) {
+    button.classList.add("enabled");
+    button.disabled = false;
+  } else {
+    button.classList.remove("enabled");
     button.disabled = true;
   }
 }
 
 function clearButton() {
-  document.getElementById("clear-all-btn").addEventListener("click", () => {
-    document.querySelectorAll(".team-name").forEach(input => (input.value = ""));
-    document.querySelectorAll(".hero-slot").forEach(slot => {
-      const selected = slot.querySelector(".selected-hero");
-      const input = slot.querySelector(".hero-search");
-      if (selected) selected.remove();
-      if (input) input.classList.remove("hidden");
-    });
-    selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
-    const resultCard = document.getElementById("result");
-    if (resultCard) resultCard.classList.add("hidden");
-    const predictBtn = document.getElementById("predict-btn");
-    predictBtn.classList.remove("enabled");
-    predictBtn.disabled = true;
+  document
+    .querySelectorAll(".team-name")
+    .forEach((input) => (input.value = ""));
+  document.querySelectorAll(".hero-slot").forEach((slot) => {
+    const selected = slot.querySelector(".selected-hero");
+    const input = slot.querySelector(".hero-search");
+    if (selected) selected.remove();
+    if (input) input.classList.remove("hidden");
   });
+  selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
+  const resultCard = document.getElementById("result");
+  if (resultCard) resultCard.classList.add("hidden");
+  predictButtonState();
+  clearButtonState();
 }
 
 function searchHero(input, team, index) {
   const query = input.value.toLowerCase().trim();
   const resultsDiv = document.getElementById(`${team}-results-${index}`);
   resultsDiv.innerHTML = "";
-  resultsDiv.parentElement.classList.add('active')
-  resultsDiv.classList.remove('hidden')
+  resultsDiv.parentElement.classList.add("active");
+  resultsDiv.classList.remove("hidden");
   if (!query) {
-    resultsDiv.parentElement.classList.remove('active')
-    resultsDiv.classList.add('hidden')
+    resultsDiv.parentElement.classList.remove("active");
+    resultsDiv.classList.add("hidden");
     return;
   }
 
-  const filtered = heroes.filter(h => h.name.toLowerCase().includes(query));
-  filtered.slice(0, 5).forEach(h => {
+  const filtered = heroes.filter((h) => h.name.toLowerCase().includes(query));
+  filtered.slice(0, 5).forEach((h) => {
     const div = document.createElement("div");
     div.className = "hero-option";
     div.innerHTML = `<img src="${h.icon}" class="hero-icon-mini"> ${h.name}`;
@@ -67,28 +79,30 @@ function searchHero(input, team, index) {
 
 function selectHero(hero, team, index, input, resultsDiv) {
   selectedHeroes[team][index] = hero.id;
-  input.classList.add('hidden');
-  const div = document.createElement('div');
+  input.classList.add("hidden");
+  const div = document.createElement("div");
   div.className = "selected-hero";
   div.innerHTML = `<div class="hero-name"><img src="${hero.icon}" class="hero-icon-medium"> <a>${hero.name}</a></div> <button id="clear-hero-btn" onclick="clearHero(this)">X</button>`;
   input.parentElement.appendChild(div);
   input.value = "";
   resultsDiv.innerHTML = "";
-  resultsDiv.classList.add('hidden');
-  resultsDiv.parentElement.classList.remove('active');
-  enableButton()
+  resultsDiv.classList.add("hidden");
+  resultsDiv.parentElement.classList.remove("active");
+  predictButtonState();
+  clearButtonState();
 }
 
-function clearHero(element){
+function clearHero(element) {
   heroSlot = element.parentElement.parentElement;
   heroSlot.getElementsByClassName("selected-hero")[0].remove();
-  heroSlot.getElementsByClassName("hero-search")[0].classList.remove('hidden');
-  team = heroSlot.getElementsByClassName("hero-search")[0].id.slice(0,5);
+  heroSlot.getElementsByClassName("hero-search")[0].classList.remove("hidden");
+  team = heroSlot.getElementsByClassName("hero-search")[0].id.slice(0, 5);
   index = heroSlot.getElementsByClassName("hero-search")[0].id[6];
   selectedHeroes[team][index] = null;
-  enableButton();
-  result = document.getElementById('result');
-  if (result.classList.contains('hidden') == false) {
+  predictButtonState();
+  clearButtonState();
+  result = document.getElementById("result");
+  if (result.classList.contains("hidden") == false) {
     clearResult();
   }
 }
@@ -98,33 +112,39 @@ async function predictMatch() {
   const result = document.getElementById("result");
   spinner.classList.remove("hidden");
 
-  const team1 = selectedHeroes.team1.filter(x => x !== null);
-  const team2 = selectedHeroes.team2.filter(x => x !== null);
+  const team1 = selectedHeroes.team1.filter((x) => x !== null);
+  const team2 = selectedHeroes.team2.filter((x) => x !== null);
 
   const team1_name = document.getElementById("team1-name").value || "Radiant";
   const team2_name = document.getElementById("team2-name").value || "Dire";
 
-  const currentPrediction = JSON.stringify({ team1, team2, team1_name, team2_name });
+  const currentPrediction = JSON.stringify({
+    team1,
+    team2,
+    team1_name,
+    team2_name,
+  });
 
   if (currentPrediction === lastPrediction) {
     spinner.classList.add("hidden");
     return;
   }
 
-   lastPrediction = currentPrediction;
+  lastPrediction = currentPrediction;
 
   const res = await fetch("/api/predict", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ team1, team2, team1_name, team2_name })
+    body: JSON.stringify({ team1, team2, team1_name, team2_name }),
   });
 
   spinner.classList.add("hidden");
 
   const data = await res.json();
-  enableButton();
+  predictButtonState();
+  clearButtonState();
   displayResult(data, team1_name, team2_name);
 }
 
@@ -135,7 +155,7 @@ function displayResult(data, team1_name, team2_name) {
   const radiantBar = document.getElementById("radiant-bar");
   const direBar = document.getElementById("dire-bar");
 
-  result.classList.remove('hidden')
+  result.classList.remove("hidden");
 
   radiantBar.style.width = radiant + "%";
   direBar.style.width = dire + "%";
@@ -159,9 +179,7 @@ function displayResult(data, team1_name, team2_name) {
   `;
 }
 
-
 function clearResult() {
-  const result = document.getElementById('result');
-  result.classList.add('hidden');
+  const result = document.getElementById("result");
+  result.classList.add("hidden");
 }
-clearButton();
