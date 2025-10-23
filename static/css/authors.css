@@ -1,12 +1,17 @@
 .authors-container {
-    padding: 40px 0;
+    height: calc(100vh-50px); /* Учитываем header и footer */
+    display: flex;
+    flex-direction: column;
 }
 
 .card {
+    background-color: var(--card);
     transition: transform 0.3s ease-in-out;
-    border: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     height: 100%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -14,24 +19,31 @@
 }
 
 .card-img-top {
-    height: 300px;
-    object-fit: cover;
-    border-radius: 8px 8px 0 0;
+     width: 80%;
+     border-radius: 50%;
+     margin: 20px auto;
+     display: block;
+     aspect-ratio: 1;
+     object-fit: cover;
 }
 
 .card-body {
-    padding: 25px;
+    padding: 15px;
+    color: var(--text-muted);
+    overflow-y: auto;
+    flex: 1;
 }
 
 .card-title {
+    text-align: center;
+    margin-top: 0;
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text);
 }
 
 .card-text {
-    color: #666;
     line-height: 1.6;
 }
 
@@ -56,13 +68,17 @@
     display: flex;
     justify-content: center;
     gap: 30px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
+    flex: 1;
+    padding: 0 20px;
 }
 
 .author-column {
     flex: 1;
-    max-width: 500px;
+    max-width: 600px;
+    min-width: 0; /* Предотвращает переполнение flex-контейнера */
+    display: flex;
 }
 
 @media (max-width: 768px) {
