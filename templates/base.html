@@ -1,48 +1,55 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dota 2 Tools</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
-</head>
-<body>
-  <header class="fade-in">
-    <nav>
-      <a href="/" data-tab="predict">🏆 Предсказание</a>
-      <a href="/history" data-tab="history">📊 История</a>
-    </nav>
-    <button id="theme-toggle">🌓</button>
-  </header>
-  <main class="fade-in">
-    {% block content %}{% endblock %}
-  </main>
-  <footer class="site-footer">
-    <div class="footer-links">
-      <a href="/about">О нас</a>
-      <a href="/authors">Авторы</a>
-      <a href="/contact">Контакты</a>
-      <a href="/privacy">Политика конфиденциальности</a>
-      <a href="/terms">Условия использования</a>
-    </div>
-    <div class="footer-copy">
-      &copy; 2025 YourSite. Все права защищены.
-    </div>
-  </footer>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dota 2 Tools</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/authors.css') }}"
+    />
+  </head>
+  <body>
+    <header class="fade-in">
+      <nav>
+        <a href="/" data-tab="predict">🏆 Предсказание</a>
+        <a href="/history" data-tab="history">📊 История</a>
+      </nav>
+      <button id="theme-toggle">🌓</button>
+    </header>
+    <main class="fade-in">{% block content %}{% endblock %}</main>
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="/authors">Авторы</a>
+        <a href="/privacy">Политика конфиденциальности</a>
+      </div>
+      <div class="footer-copy">
+        &copy; 2025 Dota-predictions. Все права защищены.
+      </div>
+    </footer>
 
-  <script>
-    const toggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) body.classList.add(savedTheme);
+    <script>
+      const toggle = document.getElementById("theme-toggle");
+      const body = document.body;
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) body.classList.add(savedTheme);
 
-    toggle.onclick = () => {
-      body.classList.toggle('light');
-      const theme = body.classList.contains('light') ? 'light' : '';
-      localStorage.setItem('theme', theme);
-    };
-  </script>
-
-
-</body>
+      toggle.onclick = () => {
+        body.classList.toggle("light");
+        const theme = body.classList.contains("light") ? "light" : "";
+        localStorage.setItem("theme", theme);
+      };
+    </script>
+  </body>
 </html>

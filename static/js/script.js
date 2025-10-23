@@ -41,13 +41,15 @@ function clearButtonState() {
 }
 
 function clearButton() {
-  document.querySelectorAll(".team-name").forEach((input) => (input.value = ""));
+  document
+    .querySelectorAll(".team-name")
+    .forEach((input) => (input.value = ""));
   document.querySelectorAll(".hero-slot").forEach((slot) => {
     const selected = slot.querySelector(".selected-hero");
     const input = slot.querySelector(".hero-search");
     if (selected) selected.remove();
     if (input) input.classList.remove("hidden");
-    input.value = ""; 
+    input.value = "";
   });
   selectedHeroes = {
     team1: [null, null, null, null, null],

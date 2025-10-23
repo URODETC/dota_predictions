@@ -1,0 +1,55 @@
+{% extends "base.html" %} {% block content %}
+<div class="authors-container">
+  <h1 class="text-center mb-5">Наша команда</h1>
+
+  <div class="authors-row">
+    <!-- Автор 1 -->
+    <div class="author-column">
+      <div class="card">
+        <img
+          src="{{ url_for('static', path='images/placeholder.png') }}"
+          class="card-img-top"
+          alt="Фото автора 1"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Urodetc</h5>
+          <p class="card-text">Тоблер Антон</p>
+          <p class="card-text">Крутой мужик.</p>
+          <div class="social-links">
+            <a href="https://github.com/URODETC" class="me-2"
+              ><i class="fab fa-github"></i
+            ></a>
+            <a href="https://steamcommunity.com/id/urodetc/" class="me-2"
+              ><i class="fa-brands fa-steam"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Автор 2 -->
+    <div class="author-column">
+      <div class="card">
+        <img
+          src="{{ url_for('static', path='images/placeholder.png') }}"
+          class="card-img-top"
+          alt="Фото автора 2"
+        />
+        <div class="card-body">
+          <h5 class="card-title">Maxmango12</h5>
+          <p class="card-text">Жалненков Максим</p>
+          <p class="card-text">Крутой мужик.</p>
+          <div class="social-links">
+            <a href="https://github.com/max12G" class="me-2"
+              ><i class="fab fa-github"></i
+            ></a>
+            <a href="https://steamcommunity.com/id/ssssdsa" class="me-2"
+              ><i class="fa-brands fa-steam"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

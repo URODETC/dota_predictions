@@ -35,8 +35,13 @@ def history_page(request: Request):
     return templates.TemplateResponse("history.html", {"request": request})
 
 
+@app.get("/authors", response_class=HTMLResponse)
+def authors(request: Request):
+    return templates.TemplateResponse("authors.html", {"request": request})
+
+
 @app.post("/api/predict")
-async def api_predict(data: dict, x_api_key: str = Header(None)):
+async def api_predict(data: dict):
 
     team1 = data.get("team1", [])
     team2 = data.get("team2", [])
