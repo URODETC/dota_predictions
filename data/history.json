@@ -386,5 +386,45 @@
     },
     "outcome": null,
     "game_time": null
+  },
+  {
+    "id": "19296363-5d40-4788-8de3-453aef579aa4",
+    "timestamp": "2025-10-24T00:10:32",
+    "team1": "Radiant",
+    "team2": "Dire",
+    "team1_heroes": [
+      39,
+      6,
+      21,
+      30,
+      27
+    ],
+    "team2_heroes": [
+      15,
+      22,
+      50,
+      145,
+      56
+    ],
+    "result": {
+      "early_game": {
+        "radiant": 10,
+        "dire": 90
+      },
+      "mid_game": {
+        "radiant": 3,
+        "dire": 97
+      },
+      "late_game": {
+        "radiant": 1,
+        "dire": 99
+      },
+      "average": {
+        "radiant": 4.7,
+        "dire": 95.3
+      }
+    },
+    "outcome": null,
+    "game_time": null
   }
 ]
