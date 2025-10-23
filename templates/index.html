@@ -12,7 +12,7 @@
           class="hero-search"
           id="team1-{{ i }}"
           placeholder="Поиск героя..."
-          oninput="searchHero(this, 'team1', {{ i }})"
+          oninput="searchHero(this, 'team1', { { i } } )"
         />
         <div class="search-results hidden" id="team1-results-{{ i }}"></div>
       </div>
