@@ -5,8 +5,7 @@
 // TODO: Добавить в нейронку не только early, mid, late, а больше значений (промежутками по 5 минут) или как-то заставлять выводить ее время матча
 // TODO: докинуть новые данные в датасет
 // TODO: построить график преимущества команды от вермени
-// TODO: Добавить проверку героев на повторы
-// TODO: Добавить инфу о сайте снизу
+// TODO: Наполнить инфу о сайте снизу
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
 let lastPrediction = null;
 
@@ -24,11 +23,15 @@ function predictButtonState() {
 }
 
 function clearButtonState() {
-  const team1 = selectedHeroes.team1.filter((x) => x !== null);
-  const team2 = selectedHeroes.team2.filter((x) => x !== null);
   const button = document.getElementById("clear-all-btn");
+  if (!button) return;
 
-  if (team1.length != 0 || team2.length != 0) {
+  const team1 = (selectedHeroes.team1 || []).filter((x) => x !== null);
+  const team2 = (selectedHeroes.team2 || []).filter((x) => x !== null);
+
+  const hasHeroes = team1.length > 0 || team2.length > 0;
+
+  if (hasHeroes) {
     button.classList.add("enabled");
     button.disabled = false;
   } else {
@@ -38,16 +41,18 @@ function clearButtonState() {
 }
 
 function clearButton() {
-  document
-    .querySelectorAll(".team-name")
-    .forEach((input) => (input.value = ""));
+  document.querySelectorAll(".team-name").forEach((input) => (input.value = ""));
   document.querySelectorAll(".hero-slot").forEach((slot) => {
     const selected = slot.querySelector(".selected-hero");
     const input = slot.querySelector(".hero-search");
     if (selected) selected.remove();
     if (input) input.classList.remove("hidden");
+    input.value = ""; 
   });
-  selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
+  selectedHeroes = {
+    team1: [null, null, null, null, null],
+    team2: [null, null, null, null, null],
+  };
   const resultCard = document.getElementById("result");
   if (resultCard) resultCard.classList.add("hidden");
   predictButtonState();
@@ -77,11 +82,31 @@ function searchHero(input, team, index) {
 }
 
 function selectHero(hero, team, index, input, resultsDiv) {
+  const allSelected = [...selectedHeroes.team1, ...selectedHeroes.team2];
+  if (allSelected.includes(hero.id)) {
+    input.classList.add("error");
+    input.placeholder = "Этот герой уже выбран!";
+    setTimeout(() => {
+      input.classList.remove("error");
+      input.placeholder = "Поиск героя...";
+    }, 1500);
+    input.value = "";
+    resultsDiv.innerHTML = "";
+    resultsDiv.classList.add("hidden");
+    resultsDiv.parentElement.classList.remove("active");
+    return;
+  }
   selectedHeroes[team][index] = hero.id;
   input.classList.add("hidden");
   const div = document.createElement("div");
   div.className = "selected-hero";
-  div.innerHTML = `<div class="hero-name"><img src="${hero.icon}" class="hero-icon-medium"> <a>${hero.name}</a></div> <button id="clear-hero-btn" onclick="clearHero(this)">X</button>`;
+  div.innerHTML = `
+    <div class="hero-name">
+      <img src="${hero.icon}" class="hero-icon-medium"> 
+      <a>${hero.name}</a>
+    </div>
+    <button id="clear-hero-btn" onclick="clearHero(this)">X</button>
+  `;
   input.parentElement.appendChild(div);
   input.value = "";
   resultsDiv.innerHTML = "";
@@ -90,7 +115,6 @@ function selectHero(hero, team, index, input, resultsDiv) {
   predictButtonState();
   clearButtonState();
 }
-
 function clearHero(element) {
   heroSlot = element.parentElement.parentElement;
   heroSlot.getElementsByClassName("selected-hero")[0].remove();
