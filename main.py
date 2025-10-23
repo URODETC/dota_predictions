@@ -40,6 +40,11 @@ def authors(request: Request):
     return templates.TemplateResponse("authors.html", {"request": request})
 
 
+@app.get("/policy", response_class=HTMLResponse)
+def authors(request: Request):
+    return templates.TemplateResponse("policy.html", {"request": request})
+
+
 @app.post("/api/predict")
 async def api_predict(data: dict):
 
