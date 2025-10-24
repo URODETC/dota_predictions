@@ -559,10 +559,29 @@ nav a:hover {
   }
 }
 
+.hero-search {
+  transition: border-color 0.8s ease, box-shadow 0.8s ease; 
+}
+
 .hero-search.error {
   border-color: var(--bad);
   box-shadow: 0 0 6px var(--bad);
   animation: shake 0.3s ease;
+}
+
+.hero-search.error::placeholder {
+  color: var(--bad);
+  opacity: 1;
+  transition: opacity 0.8s ease; 
+}
+
+.hero-search.error.fade-out {
+  border-color: var(--search-border);
+  box-shadow: 0 0 0 transparent;
+}
+
+.hero-search.error.fade-out::placeholder {
+  opacity: 0;
 }
 
 @keyframes shake {

@@ -86,11 +86,13 @@ function selectHero(hero, team, index, input, resultsDiv) {
   const allSelected = [...selectedHeroes.team1, ...selectedHeroes.team2];
   if (allSelected.includes(hero.id)) {
     input.classList.add("error");
-    input.placeholder = "Этот герой уже выбран!";
-    setTimeout(() => {
-      input.classList.remove("error");
-      input.placeholder = "Поиск героя...";
-    }, 1500);
+  input.placeholder = "Этот герой уже выбран!";
+  setTimeout(() => input.classList.add("fade-placeholder"), 800);
+
+  setTimeout(() => {
+    input.classList.remove("error", "fade-placeholder");
+    input.placeholder = "Поиск героя...";
+  }, 1600);
     input.value = "";
     resultsDiv.innerHTML = "";
     resultsDiv.classList.add("hidden");

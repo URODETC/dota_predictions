@@ -426,5 +426,85 @@
     },
     "outcome": null,
     "game_time": null
+  },
+  {
+    "id": "627dc4c4-a24f-4053-bef2-1566af11205f",
+    "timestamp": "2025-10-24T14:24:18",
+    "team1": "Radiant",
+    "team2": "Dire",
+    "team1_heroes": [
+      1,
+      2,
+      3,
+      5,
+      6
+    ],
+    "team2_heroes": [
+      15,
+      22,
+      50,
+      56,
+      145
+    ],
+    "result": {
+      "early_game": {
+        "radiant": 28,
+        "dire": 72
+      },
+      "mid_game": {
+        "radiant": 4,
+        "dire": 96
+      },
+      "late_game": {
+        "radiant": 1,
+        "dire": 99
+      },
+      "average": {
+        "radiant": 11.0,
+        "dire": 89.0
+      }
+    },
+    "outcome": null,
+    "game_time": null
+  },
+  {
+    "id": "b6defbe7-7a64-4b8d-8d18-d6f5930fe604",
+    "timestamp": "2025-10-24T14:26:05",
+    "team1": "Radiant",
+    "team2": "Dire",
+    "team1_heroes": [
+      128,
+      29,
+      11,
+      21,
+      61
+    ],
+    "team2_heroes": [
+      15,
+      22,
+      50,
+      56,
+      145
+    ],
+    "result": {
+      "early_game": {
+        "radiant": 14,
+        "dire": 86
+      },
+      "mid_game": {
+        "radiant": 11,
+        "dire": 89
+      },
+      "late_game": {
+        "radiant": 1,
+        "dire": 99
+      },
+      "average": {
+        "radiant": 8.7,
+        "dire": 91.3
+      }
+    },
+    "outcome": null,
+    "game_time": null
   }
 ]
