@@ -48,18 +48,14 @@ async def api_predict(data: dict):
 
     avg_radiant = round(
         (
-            result["early_game"]["radiant"]
-            + result["mid_game"]["radiant"]
-            + result["late_game"]["radiant"]
+            sum([i['Radiant'] for i in result])
         )
         / 3,
         1,
     )
     avg_dire = round(
         (
-            result["early_game"]["dire"]
-            + result["mid_game"]["dire"]
-            + result["late_game"]["dire"]
+            sum([i['Dire'] for i in result])
         )
         / 3,
         1,
