@@ -10,18 +10,16 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <div id="root">
-        <Header />
-        <main>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/authors" element={<Authors />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <Header />
+      <main>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/authors" element={<Authors />} />
+        </Routes>
+      </main>
+      <Footer />
     </Router>
   );
 }
