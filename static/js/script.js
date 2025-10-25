@@ -1,10 +1,3 @@
-// TODO: Сделать allert'ы(!), смерджить ластпики, доделать ластпики
-// TODO: поставить перед названиями героев их команду
-// TODO: сделать селектор (про)команд(??)
-// FIXME: css для history(?)
-// TODO: Добавить в нейронку не только early, mid, late, а больше значений (промежутками по 5 минут) или как-то заставлять выводить ее время матча
-// TODO: докинуть новые данные в датасет
-// TODO: построить график преимущества команды от вермени
 let selectedHeroes = { team1: Array(5).fill(null), team2: Array(5).fill(null) };
 let lastPrediction = null;
 
@@ -86,13 +79,13 @@ function selectHero(hero, team, index, input, resultsDiv) {
   const allSelected = [...selectedHeroes.team1, ...selectedHeroes.team2];
   if (allSelected.includes(hero.id)) {
     input.classList.add("error");
-  input.placeholder = "Этот герой уже выбран!";
-  setTimeout(() => input.classList.add("fade-placeholder"), 800);
+    input.placeholder = "Этот герой уже выбран!";
+    setTimeout(() => input.classList.add("fade-placeholder"), 800);
 
-  setTimeout(() => {
-    input.classList.remove("error", "fade-placeholder");
-    input.placeholder = "Поиск героя...";
-  }, 1600);
+    setTimeout(() => {
+      input.classList.remove("error", "fade-placeholder");
+      input.placeholder = "Поиск героя...";
+    }, 1600);
     input.value = "";
     resultsDiv.innerHTML = "";
     resultsDiv.classList.add("hidden");
