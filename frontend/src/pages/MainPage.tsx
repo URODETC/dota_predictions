@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Hero, PredictionResult, SelectedHeroes } from '../types';
-import '../main.css';
+import './MainPage.css';
 import { HeroSearch } from '../components/HeroSearch';
 import { PredictionResults } from '../components/PredictionResults';
 import { predictMatch as predictMatchAPI } from '../api/prediction';

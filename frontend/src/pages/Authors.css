@@ -1,0 +1,107 @@
+.authors-container {
+    min-height: calc(100vh - 60px); /* 100vh - высота хедера (учитываем padding) */
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.card {
+    background-color: var(--card);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+     width: 80%;
+     border-radius: 50%;
+     margin: 20px auto;
+     display: block;
+     aspect-ratio: 1;
+     object-fit: cover;
+}
+
+.card-body {
+    padding: 15px;
+    color: var(--text-muted);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.card-title {
+    text-align: center;
+    margin-top: 0;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+.card-text {
+    line-height: 1.6;
+}
+
+.social-links {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.social-links a {
+    color: #666;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #007bff;
+}
+
+/* Specific columns layout */
+.authors-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex: 1;
+    padding: 0 20px;
+}
+
+.author-column {
+    flex: 1;
+    max-width: 600px;
+    min-width: 0; /* Предотвращает переполнение flex-контейнера */
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    .authors-container {
+        min-height: 200vh; /* 2 экрана высоты на мобильных */
+    }
+
+    .authors-row {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    
+    .author-column {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 20px; /* Добавляем отступ между карточками на мобильных */
+    }
+
+    .card {
+        height: auto; /* На мобильных высота подстраивается под контент */
+        min-height: 80vh; /* Минимальная высота карточки */
+    }
+}
