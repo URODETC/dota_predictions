@@ -63,8 +63,8 @@ body.light {
   --clear-btn-enabled: #ff4040;
   --clear-btn-disabled: #606060;
   --clear-btn-text: #ffffff;
-  --clear-btn-hover: color-mix(in srgb, var(--predict-btn-bg) 80%, white);
-  --clear-btn-active: color-mix(in srgb, var(--predict-btn-bg) 65%, black);
+  --clear-btn-hover: color-mix(in srgb, var(--clear-btn-enabled) 80%, white);
+  --clear-btn-active: color-mix(in srgb, var(--clear-btn-enabled) 65%, black);
   --clear-btn-shadow: rgba(255, 64, 64, 0.3);
 }
 

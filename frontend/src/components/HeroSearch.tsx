@@ -61,7 +61,7 @@ export const HeroSearch = ({
   const selectedHero = heroes.find((h) => h.id === selectedHeroId);
 
   return (
-    <div className="hero-slot">
+    <div className={`hero-slot ${showResults && filteredHeroes.length > 0 ? "active" : ""}`}>
       {selectedHero ? (
         <div className="selected-hero">
           <div className="hero-name">

@@ -1,15 +1,21 @@
-from fastapi import FastAPI, Request, Header
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from prediction.predictions import get_prediction
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from backend.prediction.predictions import get_prediction
 import json, os, uuid, datetime
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
 
 HISTORY_FILE = "data/history.json"
+
+# origins = ["http://localhost:3000", "http://localhost:5173"]  # твой реальный сайт
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # или ["*"] — чтобы разрешить всем
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешить все HTTP-методы
+    allow_headers=["*"],  # Разрешить все заголовки
+)
 
 
 def load_history():
@@ -25,24 +31,9 @@ def save_history(data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-@app.get("/", response_class=HTMLResponse)
-def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
-
-@app.get("/history", response_class=HTMLResponse)
-def history_page(request: Request):
-    return templates.TemplateResponse("history.html", {"request": request})
-
-
-@app.get("/authors", response_class=HTMLResponse)
-def authors(request: Request):
-    return templates.TemplateResponse("authors.html", {"request": request})
-
-
-@app.get("/policy", response_class=HTMLResponse)
-def authors(request: Request):
-    return templates.TemplateResponse("policy.html", {"request": request})
+@app.get("/api/prikol")
+def api_prikol():
+    return {"message": "Максим и антон крутые"}
 
 
 @app.post("/api/predict")

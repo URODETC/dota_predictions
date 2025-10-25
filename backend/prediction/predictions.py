@@ -5,10 +5,10 @@ from itertools import combinations, product
 # import lightgbm as lgb
 
 
-model = joblib.load("prediction/model.pkl")
-pair_synergy = joblib.load("prediction/pair_synergy.pkl")
-matchup_synergy = joblib.load("prediction/matchup_synergy.pkl")
-hero_stats_time = joblib.load("prediction/hero_stats_time.pkl")
+model = joblib.load("backend/prediction/model.pkl")
+pair_synergy = joblib.load("backend/prediction/pair_synergy.pkl")
+matchup_synergy = joblib.load("backend/prediction/matchup_synergy.pkl")
+hero_stats_time = joblib.load("backend/prediction/hero_stats_time.pkl")
 
 
 def synergy(team: list):
