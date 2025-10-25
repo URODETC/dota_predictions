@@ -1,0 +1,79 @@
+.result-card {
+  background: var(--result-bg);
+  color: var(--result-text);
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: "Inter", sans-serif;
+  max-width: 600px;
+  margin: 40px auto;
+  transition: background 0.3s, color 0.3s;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.result-table th,
+.result-table td {
+  padding: 6px;
+  text-align: center;
+}
+
+#probability-bar {
+  display: flex;
+  width: 100%;
+  height: 26px;
+  margin: 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  font-size: 0.8em;
+  color: black;
+}
+
+#radiant-bar,
+#dire-bar {
+  height: 100%;
+  text-align: center;
+  line-height: 26px;
+  white-space: nowrap;
+  transition: width 0.8s ease;
+}
+
+#radiant-bar {
+  background: var(--good);
+}
+
+#dire-bar {
+  background: var(--bad);
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  #probability-bar {
+    font-size: 0.75em;
+  }
+
+  .result-table,
+  .result-table td,
+  .result-table th {
+    font-size: 0.8em;
+  }
+}
