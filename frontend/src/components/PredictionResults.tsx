@@ -1,5 +1,5 @@
-import type { PredictionResult } from '../types';
-import './PredictionResults.css';
+import type { PredictionResult } from "../types";
+import "./PredictionResults.css";
 
 interface PredictionResultsProps {
   result: PredictionResult;
@@ -7,8 +7,12 @@ interface PredictionResultsProps {
   team2Name: string;
 }
 
-export const PredictionResults = ({ result, team1Name, team2Name }: PredictionResultsProps) => {
-  const { average, early_game, mid_game, late_game } = result;
+export const PredictionResults = ({
+  result,
+  team1Name,
+  team2Name,
+}: PredictionResultsProps) => {
+  const { average, detailed } = result;
 
   return (
     <div className="result-card fade-in">
@@ -17,16 +21,16 @@ export const PredictionResults = ({ result, team1Name, team2Name }: PredictionRe
         <div
           id="radiant-bar"
           className="bar"
-          style={{ width: `${average.radiant}%`, background: '#00ff7f' }}
+          style={{ width: `${average.Radiant * 100}%`, background: "#00ff7f" }}
         >
-          {team1Name}: {average.radiant}%
+          {team1Name}: {average.Radiant * 100}%
         </div>
         <div
           id="dire-bar"
           className="bar"
-          style={{ width: `${average.dire}%`, background: '#ff4040' }}
+          style={{ width: `${average.Dire * 100}%`, background: "#ff4040" }}
         >
-          {team2Name}: {average.dire}%
+          {team2Name}: {average.Dire * 100}%
         </div>
       </div>
       <table className="result-table">
@@ -39,19 +43,44 @@ export const PredictionResults = ({ result, team1Name, team2Name }: PredictionRe
         </thead>
         <tbody>
           <tr>
-            <td>&#60;30 Мин</td>
-            <td>{early_game.radiant}%</td>
-            <td>{early_game.dire}%</td>
+            <td>&#60;25 Мин</td>
+            <td>{detailed[0].Radiant * 100}%</td>
+            <td>{detailed[0].Dire * 100}%</td>
           </tr>
           <tr>
-            <td>30-50 Мин</td>
-            <td>{mid_game.radiant}%</td>
-            <td>{mid_game.dire}%</td>
+            <td>25-30 Мин</td>
+            <td>{detailed[1].Radiant * 100}%</td>
+            <td>{detailed[1].Dire * 100}%</td>
+          </tr>
+          <tr>
+            <td>30-32.5 Мин</td>
+            <td>{detailed[2].Radiant * 100}%</td>
+            <td>{detailed[2].Dire * 100}%</td>
+          </tr>
+          <tr>
+            <td>32.5-35 Мин</td>
+            <td>{detailed[3].Radiant * 100}%</td>
+            <td>{detailed[3].Dire * 100}%</td>
+          </tr>
+          <tr>
+            <td>35-37.5 Мин</td>
+            <td>{detailed[4].Radiant * 100}%</td>
+            <td>{detailed[4].Dire * 100}%</td>
+          </tr>
+          <tr>
+            <td>37.5-40 Мин</td>
+            <td>{detailed[5].Radiant * 100}%</td>
+            <td>{detailed[5].Dire * 100}%</td>
+          </tr>
+          <tr>
+            <td>40-50 Мин</td>
+            <td>{detailed[6].Radiant * 100}%</td>
+            <td>{detailed[6].Dire * 100}%</td>
           </tr>
           <tr>
             <td>50&#60; Мин</td>
-            <td>{late_game.radiant}%</td>
-            <td>{late_game.dire}%</td>
+            <td>{detailed[7].Radiant * 100}%</td>
+            <td>{detailed[7].Dire * 100}%</td>
           </tr>
         </tbody>
       </table>

@@ -47,21 +47,27 @@ async def api_predict(data: dict):
     result = get_prediction(team1, team2)
 
     avg_radiant = round(
-        (
-            sum([i['Radiant'] for i in result])
-        )
-        / 3,
-        1,
+        (sum([i["Radiant"] for i in result])) / 8,
+        2,
     )
     avg_dire = round(
-        (
-            sum([i['Dire'] for i in result])
-        )
-        / 3,
-        1,
+        (sum([i["Dire"] for i in result])) / 8,
+        2,
     )
 
-    result["average"] = {"radiant": avg_radiant, "dire": avg_dire}
+    prediction = {
+        "average": {"Radiant": avg_radiant, "Dire": avg_dire},
+        "detailed": list(
+            map(
+                lambda x: {
+                    "Radiant": round(x["Radiant"], 2),
+                    "Dire": round(x["Dire"], 2),
+                    "Time": x["Time"],
+                },
+                result,
+            )
+        ),
+    }
 
     entry = {
         "id": str(uuid.uuid4()),
@@ -78,7 +84,7 @@ async def api_predict(data: dict):
     history = load_history()
     history.append(entry)
     save_history(history)
-    return result
+    return prediction
 
 
 @app.get("/api/history")

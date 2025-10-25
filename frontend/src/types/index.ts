@@ -11,19 +11,17 @@ export interface SelectedHeroes {
 
 export interface PredictionResult {
   average: {
-    radiant: number;
-    dire: number;
+    Radiant: number;
+    Dire: number;
   };
-  early_game: {
-    radiant: number;
-    dire: number;
-  };
-  mid_game: {
-    radiant: number;
-    dire: number;
-  };
-  late_game: {
-    radiant: number;
-    dire: number;
-  };
+  detailed: [
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number },
+    { Radiant: number; Dire: number; Time: number }
+  ]
 }
