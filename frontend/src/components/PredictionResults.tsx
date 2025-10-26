@@ -78,42 +78,19 @@ export const PredictionResults = ({
         </div>
       </div>
 
-      <table className="result-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>{team1Name}</th>
-            <th>{team2Name}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {detailed.map((d, i) => (
-            <tr key={i}>
-              <td>
-                {[
-                  "<25 Мин",
-                  "25-30 Мин",
-                  "30-32.5 Мин",
-                  "32.5-35 Мин",
-                  "35-37.5 Мин",
-                  "37.5-40 Мин",
-                  "40-50 Мин",
-                  ">50 Мин",
-                ][i]}
-              </td>
-              <td>{d.Radiant}%</td>
-              <td>{d.Dire}%</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
       <div style={{ width: "100%", height: 360, marginTop: 30 }}>
         <ResponsiveContainer>
-          <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 50 }}>
+          <LineChart
+            data={chartData}
+            margin={{ top: 10, right: 20, left: 0, bottom: 50 }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
             <XAxis dataKey="time" interval={4}>
-              <Label value="Время (минуты)" offset={-15} position="insideBottom" />
+              <Label
+                value="Время (минуты)"
+                offset={-15}
+                position="insideBottom"
+              />
             </XAxis>
             <YAxis domain={[0, 100]}>
               <Label
