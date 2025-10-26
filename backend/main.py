@@ -60,8 +60,8 @@ async def api_predict(data: dict):
         "detailed": list(
             map(
                 lambda x: {
-                    "Radiant": round(x["Radiant"], 2),
-                    "Dire": round(x["Dire"], 2),
+                    "Radiant": round(x["Radiant"] * 100),
+                    "Dire": round(x["Dire"] * 100),
                     "Time": x["Time"],
                 },
                 result,
