@@ -3,6 +3,4 @@ uvicorn
 numpy
 joblib
 lightgbm
-jinja2
 scikit-learn
-recharts

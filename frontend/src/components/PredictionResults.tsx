@@ -108,7 +108,10 @@ export const PredictionResults = ({
                 color: "var(--result-text)",
                 fontSize: "0.9em",
               }}
-              formatter={(value, name) => [`${value.toFixed(1)}%`, name]}
+              formatter={(value, name) => [
+                `${Number(value).toFixed(1)}%`,
+                name,
+              ]}
               labelFormatter={(label) => `Время: ${label}`}
             />
             <Line
