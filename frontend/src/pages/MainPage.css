@@ -147,18 +147,53 @@ h1, h2, h3 {
 @media (max-width: 700px) {
   .teams-wrapper {
     padding: 10px;
+    flex-direction: column;
+    gap: 15px;
   }
 
-  h1, h2, h3 {
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+  }
+
+  h2, h3 {
     font-size: 1.2em;
+    margin: 10px 0;
   }
 
   .team {
-    min-width: 100%;
-    padding: 10px;
+    min-width: unset;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
   }
 
-  button {
+  .team-name {
+    font-size: 1.1em;
+    padding: 12px;
+    padding-right: 2px;
+    margin-bottom: 15px;
+  }
+
+  .clear-all-wrapper {
+    padding: 0 10px;
+    margin-top: 15px;
+  }
+
+  #clear-all-btn,
+  #predict-btn {
     width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
+  }
+
+  .predict-btn-wrapper {
+    padding: 0 10px;
+    margin-top: 25px;
+  }
+
+  /* Add some spacing between teams */
+  .team + .team {
+    margin-top: 5px;
   }
 }

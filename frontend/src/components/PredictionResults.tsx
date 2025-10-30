@@ -42,7 +42,7 @@ export const PredictionResults = ({
       if (x >= a.min && x <= b.min) {
         const ratio = (x - a.min) / (b.min - a.min);
         return {
-          time: `${x} мин`,
+          time: `${x}`,
           [team1Name]: a.radiant + (b.radiant - a.radiant) * ratio,
           [team2Name]: a.dire + (b.dire - a.dire) * ratio,
         };
@@ -112,7 +112,7 @@ export const PredictionResults = ({
                 `${Number(value).toFixed(1)}%`,
                 name,
               ]}
-              labelFormatter={(label) => `Время: ${label}`}
+              labelFormatter={(label) => `Время: ${label} мин`}
             />
             <Line
               type="monotone"

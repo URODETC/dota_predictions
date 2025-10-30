@@ -21,7 +21,7 @@ export const heroes: Hero[] = [
     { id: 18, name: "SVEN", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/sven.png" },
     { id: 19, name: "TINY", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tiny.png" },
     { id: 20, name: "VENGEFUL SPIRIT", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/vengefulspirit.png" },
-    { id: 21, name: "WINDRUNNER", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/windrunner.png" },
+    { id: 21, name: "WINDRANGER", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/windrunner.png" },
     { id: 22, name: "ZEUS", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/zuus.png" },
     { id: 23, name: "KUNKKA", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/kunkka.png" },
     { id: 25, name: "LINA", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/lina.png" },

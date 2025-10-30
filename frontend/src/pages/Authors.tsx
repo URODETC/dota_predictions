@@ -9,7 +9,7 @@ export default function Authors() {
         <div className="author-column">
           <div className="card">
             <img
-              src="../../assets/images/toxa.png"
+              src="/assets/images/toxa.png"
               className="card-img-top"
               alt="Фото автора 1"
             />
@@ -49,7 +49,7 @@ export default function Authors() {
         <div className="author-column">
           <div className="card">
             <img
-              src="../../assets/images/maxim.png"
+              src="/assets/images/maxim.png"
               className="card-img-top"
               alt="Фото автора 2"
             />
