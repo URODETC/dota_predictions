@@ -10,8 +10,8 @@
 .hero-search {
   z-index: inherit;
   width: 100%;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
   border: 1px solid var(--search-border);
   background: var(--search-bg);
   color: var(--text);
@@ -129,7 +129,7 @@
 }
 
 .hero-icon-medium {
-  height: 35px;
+  height: 34.4px;
   border-radius: 6px;
 }
 
