@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
         <Link to="/terms">Правила использования</Link>
       </div>
       <div className="footer-copy">
-        &copy; 2025 Dota-predictions. Все права защищены.
+        &copy; 2025 dota-predictions. Все права защищены.
       </div>
     </footer>
   );

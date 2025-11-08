@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react';
-import type { Hero } from '../types';
-import { heroes } from '../data/heroes';
-import './HeroSearch.css';
+import { useState, useMemo } from "react";
+import type { Hero } from "../types";
+import { heroes } from "../data/heroes";
+import "./HeroSearch.css";
 
 interface HeroSearchProps {
   onSelect: (hero: Hero) => void;
   placeholder?: string;
   isDisabled?: boolean;
-  teamName: 'team1' | 'team2';
+  teamName: "team1" | "team2";
   index: number;
   selectedHeroes: (number | null)[];
   onClear: () => void;
@@ -61,11 +61,19 @@ export const HeroSearch = ({
   const selectedHero = heroes.find((h) => h.id === selectedHeroId);
 
   return (
-    <div className={`hero-slot ${showResults && filteredHeroes.length > 0 ? "active" : ""}`}>
+    <div
+      className={`hero-slot ${
+        showResults && filteredHeroes.length > 0 ? "active" : ""
+      }`}
+    >
       {selectedHero ? (
         <div className="selected-hero">
           <div className="hero-name">
-            <img src={selectedHero.icon} className="hero-icon-medium" alt={selectedHero.name} />
+            <img
+              src={selectedHero.icon}
+              className="hero-icon-medium"
+              alt={selectedHero.name}
+            />
             <a>{selectedHero.name}</a>
           </div>
           <button id="clear-hero-btn" onClick={onClear}>
@@ -93,7 +101,11 @@ export const HeroSearch = ({
                   className="hero-option"
                   onClick={() => handleSelect(hero)}
                 >
-                  <img src={hero.icon} className="hero-icon-mini" alt={hero.name} />
+                  <img
+                    src={hero.icon}
+                    className="hero-icon-mini"
+                    alt={hero.name}
+                  />
                   {hero.name}
                 </div>
               ))}
