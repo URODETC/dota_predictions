@@ -10,6 +10,7 @@ interface HeroSearchProps {
   teamName: "team1" | "team2";
   index: number;
   selectedHeroes: (number | null)[];
+  opposingTeamHeroes: (number | null)[];
   onClear: () => void;
 }
 
@@ -20,6 +21,7 @@ export const HeroSearch = ({
   teamName,
   index,
   selectedHeroes,
+  opposingTeamHeroes,
   onClear,
 }: HeroSearchProps) => {
   const [query, setQuery] = useState("");
@@ -35,7 +37,10 @@ export const HeroSearch = ({
   }, [query]);
 
   const handleSelect = (hero: Hero) => {
-    if (selectedHeroes.includes(hero.id)) {
+    if (
+      selectedHeroes.includes(hero.id) ||
+      opposingTeamHeroes.includes(hero.id)
+    ) {
       // Show error
       const input = document.getElementById(`${teamName}-${index}`);
       if (input) {

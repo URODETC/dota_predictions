@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import type { Hero, PredictionResult, SelectedHeroes } from '../types';
-import './MainPage.css';
-import { HeroSearch } from '../components/HeroSearch';
-import { PredictionResults } from '../components/PredictionResults';
-import { predictMatch as predictMatchAPI } from '../api/prediction';
+import { useState } from "react";
+import type { Hero, PredictionResult, SelectedHeroes } from "../types";
+import "./MainPage.css";
+import { HeroSearch } from "../components/HeroSearch";
+import { PredictionResults } from "../components/PredictionResults";
+import { predictMatch as predictMatchAPI } from "../api/prediction";
 
 const INITIAL_SELECTED_HEROES: SelectedHeroes = {
   team1: Array(5).fill(null),
@@ -11,21 +11,28 @@ const INITIAL_SELECTED_HEROES: SelectedHeroes = {
 };
 
 export default function MainPage() {
-  const [selectedHeroes, setSelectedHeroes] = useState<SelectedHeroes>(INITIAL_SELECTED_HEROES);
-  const [team1Name, setTeam1Name] = useState<string>('Radiant');
-  const [team2Name, setTeam2Name] = useState<string>('Dire');
+  const [selectedHeroes, setSelectedHeroes] = useState<SelectedHeroes>(
+    INITIAL_SELECTED_HEROES
+  );
+  const [team1Name, setTeam1Name] = useState<string>("Radiant");
+  const [team2Name, setTeam2Name] = useState<string>("Dire");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [predictionResult, setPredictionResult] = useState<PredictionResult | null>(null);
+  const [predictionResult, setPredictionResult] =
+    useState<PredictionResult | null>(null);
   const [lastPrediction, setLastPrediction] = useState<string | null>(null);
 
-  const handleSelectHero = (team: 'team1' | 'team2', index: number, hero: Hero) => {
+  const handleSelectHero = (
+    team: "team1" | "team2",
+    index: number,
+    hero: Hero
+  ) => {
     setSelectedHeroes((prev) => ({
       ...prev,
       [team]: prev[team].map((id, i) => (i === index ? hero.id : id)),
     }));
   };
 
-  const handleClearHero = (team: 'team1' | 'team2', index: number) => {
+  const handleClearHero = (team: "team1" | "team2", index: number) => {
     setSelectedHeroes((prev) => ({
       ...prev,
       [team]: prev[team].map((id, i) => (i === index ? null : id)),
@@ -35,16 +42,18 @@ export default function MainPage() {
 
   const handleClearAll = () => {
     setSelectedHeroes(INITIAL_SELECTED_HEROES);
-    setTeam1Name('Radiant');
-    setTeam2Name('Dire');
+    setTeam1Name("Radiant");
+    setTeam2Name("Dire");
     setPredictionResult(null);
     setLastPrediction(null);
   };
 
-  const canPredict = selectedHeroes.team1.filter(Boolean).length === 5 &&
-                     selectedHeroes.team2.filter(Boolean).length === 5;
+  const canPredict =
+    selectedHeroes.team1.filter(Boolean).length === 5 &&
+    selectedHeroes.team2.filter(Boolean).length === 5;
 
-  const hasSelectedHeroes = selectedHeroes.team1.some(Boolean) || selectedHeroes.team2.some(Boolean);
+  const hasSelectedHeroes =
+    selectedHeroes.team1.some(Boolean) || selectedHeroes.team2.some(Boolean);
 
   const predictMatch = async () => {
     const team1 = selectedHeroes.team1.filter(Boolean) as number[];
@@ -69,7 +78,7 @@ export default function MainPage() {
       const result = await predictMatchAPI(currentPrediction);
       setPredictionResult(result);
     } catch (error) {
-      console.error('Error predicting match:', error);
+      console.error("Error predicting match:", error);
     } finally {
       setIsLoading(false);
     }
@@ -95,9 +104,10 @@ export default function MainPage() {
                 key={`team1-${i}`}
                 teamName="team1"
                 index={i}
-                onSelect={(hero) => handleSelectHero('team1', i, hero)}
+                onSelect={(hero) => handleSelectHero("team1", i, hero)}
                 selectedHeroes={selectedHeroes.team1}
-                onClear={() => handleClearHero('team1', i)}
+                opposingTeamHeroes={selectedHeroes.team2}
+                onClear={() => handleClearHero("team1", i)}
               />
             ))}
           </div>
@@ -118,9 +128,10 @@ export default function MainPage() {
                 key={`team2-${i}`}
                 teamName="team2"
                 index={i}
-                onSelect={(hero) => handleSelectHero('team2', i, hero)}
+                onSelect={(hero) => handleSelectHero("team2", i, hero)}
                 selectedHeroes={selectedHeroes.team2}
-                onClear={() => handleClearHero('team2', i)}
+                opposingTeamHeroes={selectedHeroes.team1}
+                onClear={() => handleClearHero("team2", i)}
               />
             ))}
           </div>
@@ -132,7 +143,7 @@ export default function MainPage() {
           id="clear-all-btn"
           onClick={handleClearAll}
           disabled={!hasSelectedHeroes}
-          className={hasSelectedHeroes ? 'enabled' : ''}
+          className={hasSelectedHeroes ? "enabled" : ""}
         >
           Очистить всё
         </button>
@@ -143,7 +154,7 @@ export default function MainPage() {
           id="predict-btn"
           onClick={predictMatch}
           disabled={!canPredict}
-          className={canPredict ? 'enabled' : ''}
+          className={canPredict ? "enabled" : ""}
         >
           🔮 Предсказать
         </button>
