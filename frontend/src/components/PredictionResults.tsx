@@ -1,13 +1,14 @@
 import type { PredictionResult } from "../types";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
   Label,
+  Area,
+  AreaChart,
+  type TooltipContentProps,
 } from "recharts";
 import "./PredictionResults.css";
 
@@ -41,12 +42,53 @@ export const PredictionResults = ({
       const b = basePoints[i + 1];
       if (x >= a.min && x <= b.min) {
         const ratio = (x - a.min) / (b.min - a.min);
+        const radiantWin = a.radiant + (b.radiant - a.radiant) * ratio;
+        const direWin = a.dire + (b.dire - a.dire) * ratio;
         return {
           time: `${x}`,
-          [team1Name]: a.radiant + (b.radiant - a.radiant) * ratio,
-          [team2Name]: a.dire + (b.dire - a.dire) * ratio,
+          advantage: radiantWin > direWin ? radiantWin : -direWin,
         };
       }
+    }
+    return null;
+  };
+
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: TooltipContentProps<string | number, string>) => {
+    if (active && payload && payload.length) {
+      const advantage = Number(payload[0].value);
+      const isRadiantAdvantage = advantage > 0;
+      const absoluteAdvantage = Math.abs(advantage);
+      const leadingTeam = isRadiantAdvantage ? team1Name : team2Name;
+
+      return (
+        <div
+          className="custom-tooltip"
+          style={{
+            margin: "0",
+            padding: "10px",
+            backgroundColor: "var(--result-bg)",
+            border: "1px solid var(--result-text)",
+            borderRadius: "8px",
+            color: "var(--result-text)",
+            fontSize: "0.9em",
+          }}
+        >
+          <p className="label" style={{ margin: 0 }}>{`Время: ${label} мин`}</p>
+          <p
+            className="desc"
+            style={{
+              margin: "4px 0 0 0",
+              color: isRadiantAdvantage ? "var(--good)" : "var(--bad)",
+            }}
+          >
+            {`${leadingTeam}: ${absoluteAdvantage.toFixed(1)}%`}
+          </p>
+        </div>
+      );
     }
     return null;
   };
@@ -65,14 +107,17 @@ export const PredictionResults = ({
         <div
           id="radiant-bar"
           className="bar"
-          style={{ width: `${average.Radiant * 100}%`, background: "#00ff7f" }}
+          style={{
+            width: `${average.Radiant * 100}%`,
+            background: "var(--good)",
+          }}
         >
           {team1Name}: {(average.Radiant * 100).toFixed(1)}%
         </div>
         <div
           id="dire-bar"
           className="bar"
-          style={{ width: `${average.Dire * 100}%`, background: "#ff4040" }}
+          style={{ width: `${average.Dire * 100}%`, background: "var(--bad)" }}
         >
           {team2Name}: {(average.Dire * 100).toFixed(1)}%
         </div>
@@ -80,7 +125,7 @@ export const PredictionResults = ({
 
       <div style={{ width: "100%", height: 360, marginTop: 30 }}>
         <ResponsiveContainer>
-          <LineChart
+          <AreaChart
             data={chartData}
             margin={{ top: 10, right: 20, left: 0, bottom: 50 }}
           >
@@ -92,45 +137,47 @@ export const PredictionResults = ({
                 position="insideBottom"
               />
             </XAxis>
-            <YAxis domain={[0, 100]}>
+            <YAxis
+              domain={[-100, 100]}
+              tickFormatter={(value) => Math.abs(value) + "%"}
+            >
               <Label
-                value="Вероятность победы, %"
+                value={`Преимущество`}
                 angle={-90}
                 position="insideLeft"
                 style={{ textAnchor: "middle" }}
               />
             </YAxis>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--result-bg)",
-                border: "1px solid var(--result-text)",
-                borderRadius: "8px",
-                color: "var(--result-text)",
-                fontSize: "0.9em",
-              }}
-              formatter={(value, name) => [
-                `${Number(value).toFixed(1)}%`,
-                name,
-              ]}
-              labelFormatter={(label) => `Время: ${label} мин`}
-            />
-            <Line
+            <Tooltip content={CustomTooltip} />
+            <defs>
+              <linearGradient
+                id="advantageGradient"
+                x1="0"
+                y1="1"
+                x2="0"
+                y2="0"
+              >
+                <stop offset="0" stopColor="var(--bad)" stopOpacity={1} />
+                <stop offset="0.5" stopColor="var(--bad)" stopOpacity={0.5} />
+                <stop offset="0.5" stopColor="var(--good)" stopOpacity={0.5} />
+                <stop offset="1" stopColor="var(--good)" stopOpacity={1} />
+              </linearGradient>
+            </defs>
+            <Area
               type="monotone"
-              dataKey={team1Name}
-              stroke="#00ff7f"
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5 }}
+              dataKey="advantage"
+              stroke={`url(#advantageGradient)`}
+              fill={`url(#advantageGradient)`}
+              baseLine={0}
             />
-            <Line
+            <Area
               type="monotone"
-              dataKey={team2Name}
-              stroke="#ff4040"
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5 }}
+              dataKey="advantage"
+              stroke={`url(#advantageGradient)`}
+              fill={`url(#advantageGradient)`}
+              baseLine={0}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
