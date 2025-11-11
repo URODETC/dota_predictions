@@ -99,6 +99,21 @@ export const PredictionResults = ({
     if (point) chartData.push(point);
   }
 
+  // compute gradient split offset so the color change aligns with value 0
+  let gradientZeroOffset = 0.5;
+  if (chartData.length) {
+    const advValues = chartData.map((d) => d.advantage);
+    const maxAdv = Math.max(...advValues);
+    const minAdv = Math.min(...advValues);
+    if (maxAdv !== minAdv) {
+      const raw = maxAdv / (maxAdv - minAdv);
+      // clamp to [0,1]
+      gradientZeroOffset = Math.min(1, Math.max(0, raw));
+    } else {
+      gradientZeroOffset = 0.5;
+    }
+  }
+
   return (
     <div className="result-card fade-in">
       <h2>Вероятность победы:</h2>
@@ -153,13 +168,21 @@ export const PredictionResults = ({
               <linearGradient
                 id="advantageGradient"
                 x1="0"
-                y1="1"
+                y1="0"
                 x2="0"
-                y2="0"
+                y2="1"
               >
                 <stop offset="0" stopColor="var(--bad)" stopOpacity={1} />
-                <stop offset="0.5" stopColor="var(--bad)" stopOpacity={0.5} />
-                <stop offset="0.5" stopColor="var(--good)" stopOpacity={0.5} />
+                <stop
+                  offset={String(gradientZeroOffset)}
+                  stopColor="var(--bad)"
+                  stopOpacity={0.5}
+                />
+                <stop
+                  offset={String(gradientZeroOffset)}
+                  stopColor="var(--good)"
+                  stopOpacity={0.5}
+                />
                 <stop offset="1" stopColor="var(--good)" stopOpacity={1} />
               </linearGradient>
             </defs>
@@ -168,13 +191,8 @@ export const PredictionResults = ({
               dataKey="advantage"
               stroke={`url(#advantageGradient)`}
               fill={`url(#advantageGradient)`}
-              baseLine={0}
-            />
-            <Area
-              type="monotone"
-              dataKey="advantage"
-              stroke={`url(#advantageGradient)`}
-              fill={`url(#advantageGradient)`}
+              fillOpacity={1}
+              isAnimationActive={false}
               baseLine={0}
             />
           </AreaChart>
