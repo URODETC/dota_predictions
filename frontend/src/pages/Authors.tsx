@@ -3,10 +3,8 @@ import "./Authors.css";
 export default function Authors() {
   return (
     <div className="authors-container">
-      <h1 className="text-center mb-5">Наша команда</h1>
-
       <div className="authors-row">
-        <div className="author-column">
+        <div className="author-column hidden">
           <div className="card">
             <img
               src="/assets/images/toxa.png"
@@ -46,7 +44,7 @@ export default function Authors() {
           </div>
         </div>
 
-        <div className="author-column">
+        <div className="author-column hidden">
           <div className="card">
             <img
               src="/assets/images/maxim.png"
@@ -82,6 +80,42 @@ export default function Authors() {
                   <i className="fa-brands fa-steam"></i>
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="author-column">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Ссылки на ресурсы</h5>
+              <p className="card-text social-links">
+                Cсылка на &nbsp;
+                <a href="https://github.com/URODETC/dota-predictions">
+                  Github проекта
+                </a>
+              </p>
+              <p className="card-text social-links">
+                Cсылка на &nbsp;
+                <a href="https://www.kaggle.com/datasets/bwandowando/dota-2-pro-league-matches-2023">
+                  датасет проекта
+                </a>
+              </p>
+              <p className="card-text social-links">
+                Cсылка на &nbsp;
+                <a href="https://www.opendota.com/">источник матчей</a>
+              </p>
+
+              <h5 className="card-title">Ссылки на авторов</h5>
+              <p className="card-text social-links">
+                Тоблер Антон &nbsp;
+                <a href="https://github.com/URODETC">github </a>
+                <a href="https://steamcommunity.com/id/urodetc/">steam</a>
+              </p>
+              <p className="card-text social-links">
+                Максим Жалненков &nbsp;
+                <a href="https://github.com/max12G">github </a>
+                <a href="https://steamcommunity.com/id/ssssdsa">steam</a>
+              </p>
             </div>
           </div>
         </div>

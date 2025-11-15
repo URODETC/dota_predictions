@@ -51,13 +51,12 @@
 
 .social-links {
     margin-top: 20px;
-    border-top: 1px solid #eee;
     padding-top: 15px;
 }
 
 .social-links a {
+    text-decoration: none;
     color: #666;
-    font-size: 20px;
     transition: color 0.3s ease;
 }
 

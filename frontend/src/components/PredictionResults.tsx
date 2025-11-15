@@ -172,18 +172,18 @@ export const PredictionResults = ({
                 x2="0"
                 y2="1"
               >
-                <stop offset="0" stopColor="var(--bad)" stopOpacity={1} />
-                <stop
-                  offset={String(gradientZeroOffset)}
-                  stopColor="var(--bad)"
-                  stopOpacity={0.5}
-                />
+                <stop offset="0" stopColor="var(--good)" stopOpacity={1} />
                 <stop
                   offset={String(gradientZeroOffset)}
                   stopColor="var(--good)"
                   stopOpacity={0.5}
                 />
-                <stop offset="1" stopColor="var(--good)" stopOpacity={1} />
+                <stop
+                  offset={String(gradientZeroOffset)}
+                  stopColor="var(--bad)"
+                  stopOpacity={0.5}
+                />
+                <stop offset="1" stopColor="var(--bad)" stopOpacity={1} />
               </linearGradient>
             </defs>
             <Area
