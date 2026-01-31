@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.predictions import get_prediction
 from dotenv import load_dotenv
 
-load_dotenv("backend/.env")
+load_dotenv(".env")
 app = FastAPI()
 
 origins = ["http://localhost:3000", "http://localhost:5173"]
