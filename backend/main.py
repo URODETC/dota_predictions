@@ -1,23 +1,30 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.prediction.predictions import get_prediction
+from backend.predictions import get_prediction
+from dotenv import load_dotenv
 
+load_dotenv("backend/.env")
 app = FastAPI()
 
-# origins = ["http://localhost:3000", "http://localhost:5173"]  # твой реальный сайт
+origins = ["http://localhost:3000", "http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # или ["*"] — чтобы разрешить всем
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Разрешить все HTTP-методы
-    allow_headers=["*"],  # Разрешить все заголовки
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
 @app.get("/api/prikol")
 def api_prikol():
-    return {"message": "Максим и антон крутые"}
+    return {"message": "Максим и Антон крутые"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.post("/api/predict")

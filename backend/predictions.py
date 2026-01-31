@@ -2,13 +2,10 @@ import numpy as np
 import joblib
 from itertools import combinations, product
 
-# import lightgbm as lgb
-
-
-model = joblib.load("backend/prediction/model.pkl")
-pair_synergy = joblib.load("backend/prediction/pair_synergy.pkl")
-matchup_synergy = joblib.load("backend/prediction/matchup_synergy.pkl")
-hero_stats_time = joblib.load("backend/prediction/hero_stats_time.pkl")
+model = joblib.load("backend/model/model.pkl")
+pair_synergy = joblib.load("backend/model/pair_synergy.pkl")
+matchup_synergy = joblib.load("backend/model/matchup_synergy.pkl")
+hero_stats_time = joblib.load("backend/model/hero_stats_time.pkl")
 
 
 def synergy(team: list):
