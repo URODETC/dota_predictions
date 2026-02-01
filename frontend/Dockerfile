@@ -1,10 +1,16 @@
-# build
 FROM node:20-alpine AS build
-COPY package.json package.json
+
+WORKDIR /app
+
+COPY frontend/package*.json ./
 RUN npm install
-COPY . .
+
+COPY frontend .
 RUN npm run build
 
-# serve
 FROM nginx:alpine
-COPY --from=build /dist /usr/share/nginx/html
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
