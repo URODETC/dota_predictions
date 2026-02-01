@@ -2,10 +2,10 @@ import numpy as np
 import joblib
 from itertools import combinations, product
 
-model = joblib.load("backend/model/model.pkl")
-pair_synergy = joblib.load("backend/model/pair_synergy.pkl")
-matchup_synergy = joblib.load("backend/model/matchup_synergy.pkl")
-hero_stats_time = joblib.load("backend/model/hero_stats_time.pkl")
+model = joblib.load("model/model.pkl")
+pair_synergy = joblib.load("model/pair_synergy.pkl")
+matchup_synergy = joblib.load("model/matchup_synergy.pkl")
+hero_stats_time = joblib.load("model/hero_stats_time.pkl")
 
 
 def synergy(team: list):
