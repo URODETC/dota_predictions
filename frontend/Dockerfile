@@ -1,5 +1,5 @@
 # build
-FROM node:20-apline AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY frontend/package.json ./
 RUN npm install
