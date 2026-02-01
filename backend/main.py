@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/prikol")
+@app.get("/prikol")
 def api_prikol():
     return {"message": "Максим и Антон крутые"}
 
@@ -27,7 +27,7 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/api/predict")
+@app.post("/predict")
 async def api_predict(data: dict):
 
     team1 = data.get("team1", [])

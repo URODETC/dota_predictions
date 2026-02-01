@@ -1,8 +1,8 @@
 name: Deploy
 
-on: 
+on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
@@ -13,9 +13,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      - run: pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+      - run: pip install -r requirements.txt -r requirements-dev.txt
       - run: pytest
-      
+
   deploy:
     needs: test
     runs-on: ubuntu-latest
