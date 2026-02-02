@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, HTTPException, Cookie
 from backend.database import get_db
 from backend.auth.service import authenticate_user, logout_user
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth")
 
 
 @router.post("/login")

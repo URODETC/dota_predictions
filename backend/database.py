@@ -1,14 +1,14 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import String, Column, Integer
-from os import getenv
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from backend.config import settings
 
-engine = create_async_engine(getenv("DATABASE_URL"), echo=True)
-AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+engine = create_async_engine(settings.DATABASE_URL)
+new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
 async def get_db():
-    async with AsyncSessionLocal() as session:
+    async with new_session() as session:
         yield session
 
 
@@ -18,13 +18,19 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True, index=True)
-    password_hash = Column(String)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(unique=True, index=True)
+    password_hash: Mapped[str]
 
 
 class Session(Base):
     __tablename__ = "sessions"
 
-    id = Column(String, primary_key=True)
-    user_id = Column(Integer)
+    session_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int]
+
+
+async def setup_database():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)

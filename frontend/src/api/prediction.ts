@@ -5,8 +5,6 @@ const API_BASE = 'https://dota-predictions.ru';
 interface PredictionRequest {
   team1: number[];
   team2: number[];
-  team1_name: string;
-  team2_name: string;
 }
 
 export async function predictMatch(request: PredictionRequest): Promise<PredictionResult> {

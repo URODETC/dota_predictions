@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.predictions import get_prediction
+from backend.predition.router import router as prediction_router
 from dotenv import load_dotenv
+from backend.database import setup_database
 
 load_dotenv(".env")
 app = FastAPI()
@@ -16,6 +17,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(prediction_router)
+
+
+@app.post("/setup_database")
+async def setup_db():
+    await setup_database()
+    return {"status": "ok"}
+
 
 @app.get("/prikol")
 def api_prikol():
@@ -25,37 +34,3 @@ def api_prikol():
 @app.get("/health")
 def health():
     return {"status": "ok"}
-
-
-@app.post("/predict")
-async def api_predict(data: dict):
-
-    team1 = data.get("team1", [])
-    team2 = data.get("team2", [])
-
-    result = get_prediction(team1, team2)
-
-    avg_radiant = round(
-        (sum([i["Radiant"] for i in result])) / 8,
-        2,
-    )
-    avg_dire = round(
-        (sum([i["Dire"] for i in result])) / 8,
-        2,
-    )
-
-    prediction = {
-        "average": {"Radiant": avg_radiant, "Dire": avg_dire},
-        "detailed": list(
-            map(
-                lambda x: {
-                    "Radiant": round(x["Radiant"] * 100),
-                    "Dire": round(x["Dire"] * 100),
-                    "Time": x["Time"],
-                },
-                result,
-            )
-        ),
-    }
-
-    return prediction
