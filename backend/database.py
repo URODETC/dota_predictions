@@ -18,16 +18,9 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(unique=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
     password_hash: Mapped[str]
-
-
-class Session(Base):
-    __tablename__ = "sessions"
-
-    session_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int]
 
 
 async def setup_database():
