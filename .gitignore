@@ -2,3 +2,14 @@
 .gitignore
 .venv
 .idea
+backend/__pycache__/__init__.cpython-313.pyc
+backend/__pycache__/config.cpython-313.pyc
+backend/__pycache__/main.cpython-313.pyc
+backend/auth/__pycache__/dependencies.cpython-313.pyc
+backend/auth/__pycache__/schemas.cpython-313.pyc
+backend/auth/__pycache__/security.cpython-313.pyc
+backend/predition/__pycache__/prediction.cpython-313.pyc
+backend/predition/__pycache__/service.cpython-313.pyc
+backend/predition/__pycache__/router.cpython-313.pyc
+backend/__pycache__/database.cpython-313.pyc
+backend/auth/__pycache__/router.cpython-313.pyc
