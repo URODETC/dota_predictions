@@ -127,4 +127,5 @@ export const heroes: Hero[] = [
     { id: 137, name: "PRIMAL BEAST", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/primal_beast.png" },
     { id: 138, name: "MUERTA", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/muerta.png" },
     { id: 145, name: "KEZ", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/kez.png" },
+    { id: 145, name: "LARGO", icon: "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/largo.png" },
 ];

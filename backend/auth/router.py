@@ -1,26 +1,62 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, Cookie
-from backend.database import get_db
-from backend.auth.service import authenticate_user, logout_user
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, Response
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from backend.auth import schemas
+from backend.auth.dependencies import get_current_user
+from backend.auth.security import verify_password, create_access_token, get_password_hash
+from backend.config import settings
+from backend.database import get_db, User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/login")
-async def login(username: str, password: str, response: Response, db=Depends(get_db)):
-    session_id = await authenticate_user(db, username, password)
-    if not session_id:
-        raise HTTPException(status_code=401)
-
-    response.set_cookie("session_id", session_id, httponly=True)
-    return {"message": "Loged in"}
-
-
-@router.post("/logout")
-async def logout(
-    response: Response,
-    session_id: str | None = Cookie(default=None),
-    db=Depends(get_db),
+@router.post("/register")
+async def register(
+        user_data: schemas.UserIn,
+        db: AsyncSession = Depends(get_db)
 ):
-    await logout_user(session_id)
-    response.delete_cookie("session_id")
-    return {"message": "Logged out"}
+    result = await db.execute(select(User).where(User.username == user_data.username))
+    db_user = result.scalars().first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    hashed_password = get_password_hash(user_data.password)
+    new_user = User(
+        username=user_data.username,
+        password_hash=hashed_password
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    return {"message": "User created successfully"}
+
+
+@router.post("/login")
+async def login(
+        resp: Response,
+        form_data: schemas.UserIn,
+        db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(User).where(User.username == form_data.username))
+    user = result.scalars().first()
+    if not user or not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    resp.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        samesite="lax",
+        secure=True
+    )
+    return {"message": "Logged in successfully"}
+
+@router.get("/profile")
+async def profile(cur_user: User = Depends(get_current_user)):
+    return {"username": cur_user.username}
