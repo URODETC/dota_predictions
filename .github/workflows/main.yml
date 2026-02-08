@@ -14,6 +14,7 @@ jobs:
           python-version: "3.11"
 
       - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: echo -e "DATABASE_URL=postgresql+asyncpg://admin:admin@192.168.88.26:5432/dota_pred\nSECRET_KEY=123456" > .env
       - run: pytest
 
   deploy:
