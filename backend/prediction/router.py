@@ -1,14 +1,15 @@
 from fastapi import APIRouter
-from backend.predition.prediction import pred
+from backend.prediction.prediction import pred
+from backend.prediction.schemas import PredictionIn
 
-router = APIRouter(prefix="/predict")
+router = APIRouter(prefix="/predict", tags=["Prediction"])
 
 
-@router.post("/")
-def api_predict(data: dict):
+@router.post("")
+def api_predict(data: PredictionIn):
 
-    team1 = data.get("team1", [])
-    team2 = data.get("team2", [])
+    team1 = data.team1
+    team2 = data.team2
 
     result = pred.prediction(team1, team2)
 
