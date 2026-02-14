@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.predition.router import router as prediction_router
+from backend.prediction.router import router as prediction_router
 from backend.database import setup_database
 from backend.auth.router import router as auth_router
 app = FastAPI()
