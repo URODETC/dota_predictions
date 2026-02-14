@@ -1,6 +1,5 @@
 import xgboost as xgb
 import torch
-import torch.nn as nn
 import joblib
 from gbnet.xgbmodule import XGBModule
 import numpy as np
@@ -14,7 +13,7 @@ class PredictionModel:
         self.offlane = offlane
         self.pair_synergy = synergy
         self.matchup_synergy = matchup_synergy
-        self.hero_time_strenght = time_strenght
+        self.hero_time_strength = time_strenght
         self.xbg_model = xgb_model
         self.linear_model = linear_model
 
@@ -37,27 +36,27 @@ class PredictionModel:
         )
         return values.mean()
 
-    def time_strenght(self, team, duration, duration_ind = 0):
+    def time_strength(self, team, duration, duration_ind = 0):
         distribution = [0.35, 0.3, 0.2, 0.075, 0.075]
         if duration_ind == 0:
             if duration < 25:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(1, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 25 and duration < 30:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(2, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 30 and duration < 32.5:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(3, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 32.5 and duration < 35:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(4, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 35 and duration < 37.5:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(5, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 37.5 and duration < 40:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(6, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 40 and duration < 50:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(7, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+                values = np.array([self.hero_time_strength.get(a, {}).get(1, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 25 <= duration < 30:
+                values = np.array([self.hero_time_strength.get(a, {}).get(2, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 30 <= duration < 32.5:
+                values = np.array([self.hero_time_strength.get(a, {}).get(3, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 32.5 <= duration < 35:
+                values = np.array([self.hero_time_strength.get(a, {}).get(4, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 35 <= duration < 37.5:
+                values = np.array([self.hero_time_strength.get(a, {}).get(5, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 37.5 <= duration < 40:
+                values = np.array([self.hero_time_strength.get(a, {}).get(6, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            elif 40 <= duration < 50:
+                values = np.array([self.hero_time_strength.get(a, {}).get(7, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
             elif duration >= 50:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(8, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+                values = np.array([self.hero_time_strength.get(a, {}).get(8, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
         else:
-            values = np.array([self.hero_time_strenght.get(a, {}).get(duration_ind, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
+            values = np.array([self.hero_time_strength.get(a, {}).get(duration_ind, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
         return values.sum()
     
     def prediction(self, radiant, dire):
@@ -81,8 +80,8 @@ class PredictionModel:
             offlane,
             rsup,
             dsup,
-            self.time_strenght(radiant, duration, duration),
-            self.time_strenght(dire, duration, duration),
+            self.time_strength(radiant, duration, duration),
+            self.time_strength(dire, duration, duration),
             csynergy_val
         ]
 

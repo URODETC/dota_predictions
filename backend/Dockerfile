@@ -7,8 +7,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt && \
+COPY requirements-torch.txt requirements-base.txt ./
+RUN pip install --no-cache-dir -r requirements-torch.txt --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements-base.txt && \
     find /usr/local -type d -name __pycache__ -exec rm -r {} + 2>/dev/null || true && \
     find /usr/local -type d -name "*.dist-info" -exec rm -r {} + 2>/dev/null || true && \
     rm -rf /root/.cache/pip
