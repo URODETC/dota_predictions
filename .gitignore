@@ -13,3 +13,6 @@ backend/predition/__pycache__/service.cpython-313.pyc
 backend/predition/__pycache__/router.cpython-313.pyc
 backend/__pycache__/database.cpython-313.pyc
 backend/auth/__pycache__/router.cpython-313.pyc
+backend/prediction/__pycache__/schemas.cpython-313.pyc
+backend/prediction/__pycache__/router.cpython-313.pyc
+backend/prediction/__pycache__/prediction.cpython-313.pyc

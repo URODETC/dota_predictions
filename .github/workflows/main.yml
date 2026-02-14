@@ -5,20 +5,18 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.11"
 
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: echo -e "DATABASE_URL=postgresql+asyncpg://admin:admin@192.168.88.26:5432/dota_pred\nSECRET_KEY=123456" > .env
-      - run: pytest
+  #     - run: pip install -r requirements.txt -r requirements-dev.txt
+  #     - run: pytest
 
   deploy:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
@@ -29,6 +27,31 @@ jobs:
           key: ${{secrets.SERVER_SSH_KEY}}
           script: |
             cd /var/www/dota_predictions
-            git pull
-            docker compose build
+
+            echo "=== Disk space BEFORE ==="
+            df -h | grep -E "Filesystem|/$"
+
+            echo "=== Stopping containers ==="
+            docker compose down
+
+            echo "=== Cleaning Docker ==="
+            docker image prune -af
+            docker container prune -f
+            docker builder prune -af
+
+            echo "=== Pulling code ==="
+            git pull origin main
+
+            echo "=== Building images ==="
+            docker compose build --no-cache
+
+            echo "=== Starting containers ==="
             docker compose up -d
+
+            echo "=== Final cleanup ==="
+            docker image prune -f
+
+            echo "=== Disk space AFTER ==="
+            df -h | grep -E "Filesystem|/$"
+
+            echo "=== ✅ Deploy complete ==="

@@ -8,12 +8,12 @@ services:
       - ./model:/app/model
     depends_on:
       - postgres
+    restart: unless-stopped
 
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-    image: nginx:alpine
     ports:
       - "80:80"
       - "443:443"
@@ -23,6 +23,7 @@ services:
       - certbot_conf:/etc/letsencrypt
     depends_on:
       - backend
+    restart: unless-stopped
 
   certbot:
     image: certbot/certbot
@@ -39,13 +40,14 @@ services:
       -d www.${DOMAIN_NAME}
 
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
   pgdata:
