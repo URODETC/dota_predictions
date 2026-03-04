@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from typing import Optional
 from jose import jwt
 from passlib.context import CryptContext
-from backend.config import settings
+from os import getenv
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -19,5 +19,5 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.now() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY)
+    encoded_jwt = jwt.encode(to_encode, getenv("SECRET_KEY"))
     return encoded_jwt

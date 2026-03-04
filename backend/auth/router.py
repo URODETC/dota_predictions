@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.auth import schemas
 from backend.auth.dependencies import get_current_user
 from backend.auth.security import verify_password, create_access_token, get_password_hash
-from backend.config import settings
+from os import getenv
 from backend.database import get_db, User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -43,7 +43,7 @@ async def login(
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
 
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=int(getenv("ACCESS_TOKEN_EXPIRE_MINUTES")))
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
@@ -51,7 +51,7 @@ async def login(
         key="access_token",
         value=access_token,
         httponly=True,
-        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        max_age=int(getenv("ACCESS_TOKEN_EXPIRE_MINUTES")) * 60,
         samesite="lax",
         secure=True
     )

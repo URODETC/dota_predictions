@@ -1,16 +1,21 @@
-FROM node:20-alpine AS build
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-COPY frontend/package*.json ./
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 
-COPY frontend .
+COPY . .
+
+ARG VITE_API_BASE=https://dota-predictions.ru
+ENV VITE_API_BASE=$VITE_API_BASE
+
 RUN npm run build
 
-FROM nginx:alpine
+#prod
+FROM nginx:alpine AS prod
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 443
 CMD ["nginx", "-g", "daemon off;"]

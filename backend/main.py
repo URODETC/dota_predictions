@@ -20,12 +20,6 @@ async def setup_db():
     await setup_database()
     return {"status": "ok"}
 
-
-@app.get("/prikol")
-def api_prikol():
-    return {"message": "Максим и Антон крутые"}
-
-
 @app.get("/health")
 def health():
     return {"status": "ok"}
