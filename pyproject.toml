@@ -10,6 +10,7 @@ dependencies = [
     "joblib==1.5.3",
     "numpy==2.4.0rc1",
     "pandas==3.0.0",
+    "pandas-stubs~=3.0.0",
     "passlib==1.7.4",
     "pydantic==2.12.5",
     "pydantic-settings==2.12.0",
