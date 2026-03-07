@@ -1,11 +1,16 @@
-import argparse
+from __future__ import annotations
+
+import os
+
 import joblib
 import pandas as pd
 import torch
 import xgboost as xgb
-from torch.utils.data import Dataset, DataLoader
 from gbnet import xgbmodule
-from training.build_stats import build_train_features
+from torch.utils.data import Dataset, DataLoader
+
+from shared.models import N_FEATURES
+from shared.utils import build_features
 
 
 class ForecastDataset(Dataset):
@@ -20,18 +25,20 @@ class ForecastDataset(Dataset):
     def __getitem__(self, idx):
         return self.x[idx], self.y[idx]
 
-def train_linear(x: pd.DataFrame, y: pd.DataFrame,
-                 num_epochs: int = 10, lr: float = 1e-3,
+def train_linear(x: pd.DataFrame,
+                 y: pd.DataFrame,
+                 num_epochs: int = 10,
+                 lr: float = 1e-3,
                  batch_size: int = 32):
     dataset = ForecastDataset(x, y)
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-    in_features = x.shape[1]
-    linear_model = torch.nn.Linear(in_features, 1)
+    linear_model = torch.nn.Linear(N_FEATURES, 1)
     optimizer = torch.optim.Adam(linear_model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
 
-    X_tensor, y_tensor = torch.tensor(x.values, dtype=torch.float32), torch.tensor(y.values, dtype=torch.float32)
+    X_tensor = torch.tensor(x.values, dtype=torch.float32)
+    y_tensor = torch.tensor(y.values, dtype=torch.float32)
     if y_tensor.ndim == 1:
         y_tensor = y_tensor.unsqueeze(1)
 
@@ -77,53 +84,43 @@ def evaluate_ensemble(linear_model, xnet, X_tensor, X_matrix, y_tensor):
     print(f"\nEnsemble loss: {loss.item():.6f}")
     return loss.item()
 
-def main(data_dir: str = "data", model_dir: str = "model",
-         linear_epochs: int = 10, xgb_iters: int = 10):
-    import os; os.makedirs(model_dir, exist_ok=True)
+def main(data_dir: str = "data",
+         model_dir: str = "model",
+         linear_epochs: int = 10,
+         xgb_iters: int = 10):
+    os.makedirs(model_dir, exist_ok=True)
 
     artifacts_path = f"{model_dir}/artifacts.pkl"
     te_path = f"{model_dir}/team_expanded.parquet"
-    teams_path = f"{model_dir}/teams.parquet"
 
-    if (os.path.exists(artifacts_path)) and os.path.exists(te_path) and os.path.exists(teams_path):
+    if (os.path.exists(artifacts_path)) and os.path.exists(te_path):
         print("Загружаем готовые артефакты и данные...")
         artifacts = joblib.load(artifacts_path)
         teams_expanded = joblib.load(te_path)
     else:
-        print("Артефакты не найдены — запускаем build_stats...")
-        from training.build_stats import main as build_main
-        _, teams_expanded, artifacts = build_main(data_dir=data_dir, model_dir=model_dir)
-
-    pair_synergy = artifacts["pair_synergy"]
-    matchup_synergy = artifacts["matchup_synergy"]
-    carry_matchup = artifacts["carry_matchup"]
-    mid_matchup = artifacts["mid_matchup"]
-    offlane_matchup = artifacts["offlane_matchup"]
-    hero_stats_time = artifacts["hero_stats_time"]
-    sup_synergy = artifacts["sup_synergy"]
+        raise FileNotFoundError(f"Файлы не найдены в {model_dir}")
 
     print("\nПостроение признаков...")
-    train_df = build_train_features(
+    train_df = build_features(
         teams_expanded,
-        pair_synergy, matchup_synergy,
-        carry_matchup, mid_matchup, offlane_matchup,
-        sup_synergy, hero_stats_time,
+        artifacts["pair_synergy"],
+        artifacts["matchup_synergy"],
+        artifacts["carry_matchup"],
+        artifacts["mid_matchup"],
+        artifacts["offlane_matchup"],
+        artifacts["sup_synergy"],
+        artifacts["hero_stats_time"],
     )
     target = teams_expanded[["radiant_win"]]
-
-    x = train_df
-    y = target
+    print(f"Признаки: {train_df.shape}, колонки: {list(train_df.columns)}")
 
     print(f"\nОбучение LinearModel ({linear_epochs} эпох)...")
-    linear_model, X_tensor, y_tensor = train_linear(x, y, num_epochs=linear_epochs)
+    linear_model, X_tensor, y_tensor = train_linear(train_df, target, num_epochs=linear_epochs)
 
     print(f"\nОбучение XGBModule ({xgb_iters} итераций)...")
-    xnet = train_xgb(X_tensor, y_tensor,
-                     n_samples=len(x), n_features=x.shape[1],
-                     iters=xgb_iters)
+    xnet = train_xgb(X_tensor, y_tensor, n_samples=len(train_df), n_features=N_FEATURES, iters=xgb_iters)
 
-    X_matrix = xgb.DMatrix(X_tensor)
-    evaluate_ensemble(linear_model, xnet, X_tensor, X_matrix, y_tensor)
+    evaluate_ensemble(linear_model, xnet, X_tensor, y_tensor)
 
     print(f"\nСохранение весов → {model_dir}/")
     torch.save(linear_model.state_dict(), f"{model_dir}/linear.pth")
@@ -133,10 +130,16 @@ def main(data_dir: str = "data", model_dir: str = "model",
     return linear_model, xnet
 
 if __name__ == "__main__":
+    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", type=str, default="data")
     parser.add_argument("--model_dir", type=str, default="model")
     parser.add_argument("--linear_epochs", type=int, default=10)
     parser.add_argument("--xgb_iters", type=int, default=10)
     args = parser.parse_args()
-    main(data_dir=args.data_dir, model_dir=args.model_dir, linear_epochs=args.linear_epochs, xgb_iters=args.xgb_iters)
+    main(
+        data_dir=args.data_dir,
+        model_dir=args.model_dir,
+        linear_epochs=args.linear_epochs,
+        xgb_iters=args.xgb_iters
+    )

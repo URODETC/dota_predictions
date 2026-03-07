@@ -1,39 +1,25 @@
 from fastapi import APIRouter
 from backend.prediction.prediction import pred
-from backend.prediction.schemas import PredictionIn
+from backend.prediction.schemas import PredictionIn, PredictionOut, TimedResult
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
 
-@router.post("")
-def api_predict(data: PredictionIn):
+@router.post("", response_model=PredictionOut)
+def api_predict(data: PredictionIn) -> PredictionOut:
+    results = pred.prediction(data.team1, data.team2)
 
-    team1 = data.team1
-    team2 = data.team2
+    avg_radiant = round(sum(r["Radiant"] for r in results) / len(results), 2)
+    avg_dire    = round(sum(r["Dire"]    for r in results) / len(results), 2)
 
-    result = pred.prediction(team1, team2)
-
-    avg_radiant = round(
-        (sum([i["Radiant"] for i in result])) / 8,
-        2,
-    )
-    avg_dire = round(
-        (sum([i["Dire"] for i in result])) / 8,
-        2,
-    )
-
-    prediction = {
-        "average": {"Radiant": avg_radiant, "Dire": avg_dire},
-        "detailed": list(
-            map(
-                lambda x: {
-                    "Radiant": round(x["Radiant"] * 100),
-                    "Dire": round(x["Dire"] * 100),
-                    "Time": x["Time"],
-                },
-                result,
+    return PredictionOut(
+        average={"Radiant": avg_radiant, "Dire": avg_dire},
+        detailed=[
+            TimedResult(
+                Radiant=round(r["Radiant"] * 100),
+                Dire=round(r["Dire"] * 100),
+                Time=r["Time"],
             )
-        ),
-    }
-
-    return prediction
+            for r in results
+        ],
+    )

@@ -1,23 +1,31 @@
-import os
-import pytest
 import asyncio
-import numpy as np
-import torch
+import os
 from unittest.mock import patch, MagicMock
 
+import numpy as np
+import pytest
+import torch
+
 FAKE_ARTIFACTS = {
-    "carry_matchup":   np.full((150, 150), 0.5, dtype=np.float32),
+    "carry_matchup":   {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
     "matchup_synergy": {(i, j): 0.02 for i in range(1, 15) for j in range(1, 15)},
-    "mid_matchup":     np.full((150, 150), 0.5, dtype=np.float32),
-    "offlane_matchup": np.full((150, 150), 0.5, dtype=np.float32),
+    "mid_matchup":     {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
+    "offlane_matchup": {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
     "pair_synergy":    {(i, j): 0.55 for i in range(1, 15) for j in range(i + 1, 15)},
     "hero_stats_time": {h: {t: 0.5 for t in range(1, 9)} for h in range(1, 150)},
-    "sup_synergy":     np.full((150, 150), 0.5, dtype=np.float32),
+    "sup_synergy":     {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
 }
 
+
 patch("joblib.load", return_value=FAKE_ARTIFACTS).start()
-patch("torch.load",  return_value={}).start()
-patch("torch.nn.Linear.load_state_dict", return_value=None).start()
+
+_FAKE_LINEAR_SD = {
+    "weight": torch.zeros(1, 10),
+    "bias":   torch.zeros(1),
+}
+patch("torch.load",  return_value=_FAKE_LINEAR_SD).start()
+
+patch("gbnet.xgbmodule.XGBModule.load_state_dict", return_value=None).start()
 
 def get_test_db_url() -> str:
     url = os.getenv("DATABASE_URL")
@@ -63,7 +71,7 @@ async def db_session(test_engine):
         session = AsyncSession(bind=conn, expire_on_commit=False)
         yield session
         await session.close()
-        await conn.rollback()   # ← ключевое: все изменения теста откатываются
+        await conn.rollback()
 
 
 @pytest.fixture(scope="module")

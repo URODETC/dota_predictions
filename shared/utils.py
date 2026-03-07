@@ -1,13 +1,14 @@
 from itertools import combinations, product
+
 import numpy as np
 import pandas as pd
 
-
 _POSITION_WEIGHTS = np.array([0.35, 0.3, 0.2, 0.075, 0.075], dtype=np.float32)
 
-_TIME_EDGES = np.array([25, 30, 32.5, 35, 37.5, 40, 40], dtype=np.float32)
 
-def duration_to_category(duration_minutes: float | np.ndarray) -> np.signedinteger:
+_TIME_EDGES = np.array([25, 30, 32.5, 35, 37.5, 40, 50], dtype=np.float32)
+
+def _duration_to_category(duration_minutes: float | np.ndarray) -> np.signedinteger | int:
     return np.searchsorted(_TIME_EDGES, duration_minutes, side="right") + 1
 
 def sort_dict(dictionary: dict, reverse: bool = False) -> dict:
@@ -41,7 +42,7 @@ def time_strength(
         hero_stats_time: dict,
         duration_ind: int = 0,
 ) -> float:
-    cat = int(duration_ind) if duration_ind > 0 else int(duration_to_category(duration))
+    cat = int(duration_ind) if duration_ind > 0 else int(_duration_to_category(duration))
     values = np.array(
         [
             hero_stats_time.get(a, {}).get(cat, 0.0) * _POSITION_WEIGHTS[k]
@@ -71,7 +72,7 @@ def build_features(
     D = te[d_cols].values.astype(int)
     dur = te["duration"].values
 
-    cats = duration_to_category(dur).astype(int)
+    cats = _duration_to_category(dur).astype(int)
 
     def _synergy_row(heroes: np.ndarray, psyn: dict) -> np.ndarray:
         out = np.empty(n, dtype=np.float32)
@@ -88,8 +89,7 @@ def build_features(
         out = np.empty(n, dtype=np.float32)
         for i, (row, cat) in enumerate(zip(heroes, cats_)):
             vals = np.array(
-                [hst.get(h, {}).get(cat, 0.0) * _POSITION_WEIGHTS[k]
-                 for k, h in enumerate(row)],
+                [hst.get(h, {}).get(cat, 0.0) * _POSITION_WEIGHTS[k] for k, h in enumerate(row)],
                 dtype=np.float32,
             )
             out[i] = vals.sum()
@@ -104,19 +104,16 @@ def build_features(
 
     r_syn = _synergy_row(R, pair_synergy)
     d_syn = _synergy_row(D, pair_synergy)
-
     r_time = _time_col(R, cats, hero_stats_time)
     d_time = _time_col(D, cats, hero_stats_time)
-
     c_matchup = _lookup1(R[:, 0], D[:, 0], carry_matchup)
     m_matchup = _lookup1(R[:, 1], D[:, 1], mid_matchup)
     o_matchup = _lookup1(R[:, 2], D[:, 2], offlane_matchup)
     r_sup = _lookup1(R[:, 3], R[:, 4], sup_synergy)
     d_sup = _lookup1(D[:, 3], D[:, 4], sup_synergy)
-
     csyn = _csyn_col(R, D, matchup_synergy)
 
-    train = pd.DataFrame({
+    return pd.DataFrame({
         "synergy": r_syn - d_syn,
         "carry_matchup": c_matchup,
         "mid_matchup": m_matchup,
@@ -127,4 +124,3 @@ def build_features(
         "r_syn_raw": r_syn,
         "d_syn_raw": d_syn,
     })
-    return train
