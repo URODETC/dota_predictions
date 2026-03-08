@@ -18,6 +18,7 @@ def cmd_list() -> None:
         acc = v.get("metrics", {}).get("accuracy", "-")
         brier = v.get("metrics", {}).get("brier", "-")
         ts = (v.get("created_at") or "")[:19]
+        marker = " ← current" if ver == current else ""
         print(f"{ver:<22} {status:<12} {str(acc):<10} {str(brier):<8} {ts}{marker}")
 
 def cmd_rollback(version: str | None) -> None:
