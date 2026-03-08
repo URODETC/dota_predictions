@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from backend.prediction.prediction import pred
 from backend.prediction.schemas import PredictionIn, PredictionOut, TimedResult
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
@@ -7,6 +6,9 @@ router = APIRouter(prefix="/predict", tags=["Prediction"])
 
 @router.post("", response_model=PredictionOut)
 def api_predict(data: PredictionIn) -> PredictionOut:
+    from backend.prediction.prediction import get_pred
+    pred = get_pred()
+
     results = pred.prediction(data.team1, data.team2)
 
     avg_radiant = round(sum(r["Radiant"] for r in results) / len(results), 2)

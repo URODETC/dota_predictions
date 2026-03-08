@@ -47,7 +47,7 @@ jobs:
         run: uv sync --frozen --group dev
 
       - name: Lint
-        run: uv run ruff check backend/
+        run: uv run ruff check backend/ shared/ training/ pipeline/
 
       - name: Run tests
         run: uv run pytest backend/tests/ -v --tb=short

@@ -62,8 +62,6 @@ export default function MainPage() {
     const currentPrediction = {
       team1,
       team2,
-      team1_name: team1Name,
-      team2_name: team2Name,
     };
     const predictionKey = JSON.stringify(currentPrediction);
 

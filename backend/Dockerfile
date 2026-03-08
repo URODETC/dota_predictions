@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY backend ./backend
 COPY shared ./shared
+COPY pipeline ./pipeline
 
 EXPOSE 8000
 CMD ["uvicorn", "backend.main:app", \

@@ -2,17 +2,24 @@ name: Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollback_version:
+        description: "Откатить модель на версию (пусто = деплой HEAD)"
+        required: false
+        default: ""
 
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/urodetc
 
 jobs:
-  test:
+  ci:
     uses: ./.github/workflows/ci.yml
 
   build-and-push:
-    needs: test
+    needs: ci
+    if: github.event.inputs.rollback_version == ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,28 +62,62 @@ jobs:
             ${{ env.IMAGE_PREFIX }}/dota-predictions-frontend:${{ github.sha }}
   deploy:
     needs: build-and-push
-    uses: appleboy/ssh-action@v1
-    with:
-      host: ${{ secrets.SERVER_HOST }}
-      username: ${{ secrets.SERVER_USER }}
-      key: ${{ secrets.SERVER_SSH_KEY }}
-      envs: TAG
-      script: |
-        set -e  
-        cd /var/www/dota-predictions
-        echo "▶ Pulling code"
-        git pull origin main
-        echo "▶ Pulling new images (tag: ${{ needs.build-and-push.outputs.tag }})"
-        TAG=${{ needs.build-and-push.outputs.tag }}
-        set -a && source /etc/dota/.env && set +a
-        docker compose -f docker-compose.prod.yml pull backend frontend
-        echo "▶ Restarting services
-        docker compose -f docker-compose.prod.yml up -d \
-              --no-deps --force-recreate \
-              backend frontend
-        echo "▶ Waiting for healthcheck"
-        sleep 10
-        docker compose -f docker-compose.prod.yml ps
-        echo "▶ Cleanup old images"
-        docker image prune -f
-        echo "✅ Deploy complete (tag: $TAG)"
+    if: always() && needs.ci.result == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy via ssh
+        uses: appleboy/ssh-action@v1
+        env:
+          TAG: ${{ needs.build-and-push.outputs.tag || 'latest' }}
+          ROLLBACK_VERSION: ${{ github.event.inputs.rollback_version }}
+          INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
+          BACKEND_URL: ${{ secrets.BACKEND_INTERNAL_URL }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: TAG,ROLLBACK_VERSION,INTERNAL_TOKEN,BACKEND_URL
+          script: |
+            set -euo pipefail
+            cd /var/www/dota-predictions
+            echo "▶ Pulling code"
+            git pull origin main
+            
+            set -a && source /etc/dota/.env && set +a
+            
+            if [ -n "$ROLLBACK_VERSION" ]; then
+              echo "Откат модели → $ROLLBACK_VERSION"
+              python scripts/rollback.py --version "$ROLLBACK_VERSION"
+              curl -sf -X POST "${BACKEND_URL}/internal/reload" \
+                -H "X-Internal-Token: ${INTERNAL_TOKEN}" && echo "hot-reload ok"
+              exit 0
+            fi
+            
+            echo "▶ Pulling new images (tag: ${{ needs.build-and-push.outputs.tag }})"
+            TAG=$TAG docker compose -f docker-compose-prod.yml pull backend frontend
+            
+            echo "▶ Restarting services
+            echo "▶ Restart backend"
+            TAG=$TAG docker compose -f docker-compose-prod.yml up -d \
+              --no-deps --wait --wait-timeout 120 backend
+            
+            echo "▶ Hot-reload модели из S3"
+            curl -sf -X POST "${BACKEND_URL}/internal/reload" \
+              -H "X-Internal-Token: ${INTERNAL_TOKEN}" || echo "warn: reload failed"
+
+            echo "▶ Restart frontend"
+            TAG=$TAG docker compose -f docker-compose-prod.yml up -d \
+              --no-deps --wait --wait-timeout 60 frontend
+
+            echo "▶ Healthcheck"
+            for i in $(seq 1 6); do
+              STATUS=$(curl -sf "${BACKEND_URL}/health" \
+                | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || echo fail)
+              [ "$STATUS" = "ok" ] && { echo "✅ healthy (attempt $i)"; break; }
+              [ "$i" = "6" ] && { echo "❌ Unhealthy — rollback image"; TAG=latest docker compose -f docker-compose-prod.yml up -d --no-deps backend; exit 1; }
+              sleep 10
+            done
+
+            docker image prune -f
+            echo "✅ Deploy complete tag=$TAG"
