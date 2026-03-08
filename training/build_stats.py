@@ -23,8 +23,16 @@ def load_raw_data(data_dir: str = "data") -> tuple[pd.DataFrame, pd.DataFrame]:
         players = pd.concat([pd.read_parquet(f) for f in player_files], ignore_index=True)
         print(f"Загружено: {len(matches)} матчей, {len(players)} записей игроков")
         return players, matches
-    else:
+
+    csv_players = sorted(data_path.glob("players*.csv"))
+    csv_matches = sorted(data_path.glob("*metadata*.csv"))
+    if not csv_players or not csv_matches:
         raise FileNotFoundError(f"Нет данных в {data_dir}")
+
+    players = pd.concat([pd.read_csv(f) for f in csv_players], ignore_index=True)
+    matches = pd.concat([pd.read_csv(f) for f in csv_matches], ignore_index=True)
+    print(f"Загружено CSV: {len(matches)} матчей, {len(players)} записей игроков")
+    return players, matches
 
 
 def preprocess(players: pd.DataFrame, matches: pd.DataFrame) -> pd.DataFrame:

@@ -10,6 +10,9 @@ import boto3
 import joblib
 import torch
 from botocore.exceptions import ClientError
+import dotenv
+
+dotenv.load_dotenv()
 
 log = logging.getLogger(__name__)
 
@@ -169,6 +172,15 @@ class S3Storage:
         self._put_json(_PRODUCTION, {"version": version, "updated_at": meta["promoted_at"]})
         log.info(f"Версия {version} -> production")
         return meta
+
+    def _archive_version(self, version: str) -> None:
+        meta_key = _META.format(version=version)
+        if not self._exists(meta_key):
+            return
+        meta = self._get_json(meta_key)
+        meta["status"] = "archived"
+        self._put_json(meta_key, meta)
+        log.info("Версия %s → archived", version)
 
     def rollback(self, version: str) -> dict:
         """Rollback production to a previous version."""
