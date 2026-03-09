@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import time
@@ -17,12 +18,15 @@ log = logging.getLogger(__name__)
 DOTA2_LEAGUES_URL = "https://www.dota2.com/webapi/IDOTA2League/GetLeagueInfoList/v001"
 OPENDOTA_BASE     = "https://api.opendota.com/api"
 
-MIN_PRIZE_POOL = int(os.getenv("MIN_PRIZE_POOL", "100000"
-                                                 ""))
-MIN_TIER = int(os.getenv("MIN_LEAGUE_TIER", "2"))
+MIN_PRIZE_POOL = 100_000
+MIN_TIER = 2
 
-RATE_DELAY     = float(os.getenv("OPENDOTA_RATE_DELAY", "1.1"))
+RATE_DELAY     = 1.2
 MAX_RETRIES    = 5
+
+_SEEN_IDS_KEY = "raw/seen_match_ids.json"
+
+_SEEN_IDS_LOCAL = "data/seen_match_ids.json"
 
 _MATCH_FIELDS = frozenset([
     "match_id", "radiant_win", "duration", "game_mode", "start_time",
@@ -86,6 +90,44 @@ def _opendota_get(endpoint: str, params: dict | None = None) -> list | dict:
 
     raise RuntimeError(f"OpenDota: Не удалось получить {url} после {MAX_RETRIES} попыток")
 
+
+def load_seen_ids(storage = None, local_path: str = _SEEN_IDS_LOCAL) -> set[int]:
+    if storage is not None:
+        try:
+            ids = set(storage._get_json(_SEEN_IDS_KEY))
+            log.info("seen_match_ids: загружено %d из S3", len(ids))
+            return ids
+        except Exception:
+            log.debug("seen_match_ids не найден в S3, проверяем локально")
+
+    p = Path(local_path)
+    if p.exists():
+        try:
+            ids = set(json.loads(p.read_text()))
+            log.info("seen_match_ids: загружено %d из %s", len(ids), local_path)
+            return ids
+        except Exception as e:
+            log.warning("Ошибка чтения %s: %s", local_path, e)
+
+    log.info("seen_match_ids: файл не найден, начинаем с нуля")
+    return set()
+
+def save_seen_ids(
+        ids: set[int],
+        storage = None,
+        local_path: str = _SEEN_IDS_LOCAL,
+) -> None:
+    if storage is not None:
+        try:
+            storage._put_json(_SEEN_IDS_KEY, sorted(ids))
+            log.info("seen_match_ids: сохранено %d → S3", len(ids))
+        except Exception as e:
+            log.error("Ошибка сохранения seen_match_ids на S3: %s", e)
+
+    Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(local_path).write_text(json.dumps(sorted(ids)))
+    log.debug("seen_match_ids: сохранено %d → %s", len(ids), local_path)
+
 def fetch_dota2_leagues() -> list[dict]:
     global _dota2_session
     if _dota2_session is None:
@@ -148,49 +190,81 @@ def fetch_match_detail(match_id: int) -> tuple[dict | None, list[dict]]:
 def fetch_and_save(
         days_back: int = 90,
         dry_run: bool = False,
+        count_new: bool = False,
         save_local: bool = True,
         save_s3: bool = True,
         local_dir: str = "data",
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    since_ts = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
-    date_tag = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    since_ts = 0
+    if days_back is not None:
+        since_ts = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
+        log.info("Ограничение по времени: последние %d дней", days_back)
 
-    log.info("Сбор матчей за последние %d дней", days_back)
+    storage = None
+    if save_s3:
+        try:
+            from pipeline.storage import get_storage
+            storage = get_storage()
+        except Exception as e:
+            log.warning("S3 недоступен, работаем только локально: %s", e)
+
+    seen_ids = load_seen_ids(storage=storage)
 
     league_ids = fetch_tier1_league_ids()
     log.info("Tier-1 лиг: %d", len(league_ids))
 
     all_match_ids: set[int] = set()
     for lid in sorted(league_ids):
-        ids = fetch_league_matches_ids(lid, since_ts)
+        ids = fetch_league_matches_ids(lid, since_ts=since_ts)
         all_match_ids.update(ids)
         if ids:
             log.debug("Лига %d: %d матчей", lid, len(ids))
-    log.info("Уникальных match_id: %d", len(all_match_ids))
+
+    new_match_ids = all_match_ids - seen_ids
+    log.info(
+        "Всего match_id: %d | уже загружено: %d | новых: %d",
+        len(all_match_ids),
+        len(all_match_ids) - len(new_match_ids),
+        len(new_match_ids),
+    )
+
+    if count_new:
+        print(len(new_match_ids))
+        return pd.DataFrame(), pd.DataFrame()
+
+    if dry_run:
+        log.info("[dry-run] пропускаем скачивание деталей.")
+
+    if not new_match_ids:
+        log.info("Нет матчей для загрузки")
+        return pd.DataFrame(), pd.DataFrame()
 
     meta_rows: list[dict] = []
     player_rows: list[dict] = []
-    total = len(all_match_ids)
+    successfully_fetched: set[int] = set()
+    total = len(new_match_ids)
 
-    if dry_run:
-        log.info("[dry-run] Пропускаем скачивание деталей.")
-        return pd.DataFrame(), pd.DataFrame()
-
-    for i, mid in enumerate(sorted(all_match_ids), 1):
+    for i, mid in enumerate(sorted(new_match_ids), 1):
         meta, players = fetch_match_detail(mid)
         if meta:
             meta_rows.append(meta)
             player_rows.extend(players)
-        if i%50==0:
+            successfully_fetched.add(mid)
+        if i % 50 == 0:
             log.info("  %d / %d матчей обработано", i, total)
 
     if not meta_rows:
-        log.warning("Не получено ни одного матча!")
+        log.warning("Не получено ни одного нового матча.")
         return pd.DataFrame(), pd.DataFrame()
 
     matches_df = pd.DataFrame(meta_rows)
     players_df = pd.DataFrame(player_rows)
-    log.info("Итого: %d матчей, %d записей игроков", len(matches_df), len(players_df))
+    log.info(
+        "Загружено: %d матчей, %d записей игроков",
+        len(matches_df), len(players_df),
+    )
+
+    date_tag = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
     if save_local:
         Path(local_dir).mkdir(parents=True, exist_ok=True)
@@ -198,14 +272,15 @@ def fetch_and_save(
         players_df.to_parquet(f"{local_dir}/players_{date_tag}.parquet", index=False)
         log.info("Локально → %s/", local_dir)
 
-    if save_s3:
+    if storage is not None:
         try:
-            from pipeline.storage import get_storage
-            storage = get_storage()
             storage.save_raw_matches(matches_df, date_tag)
             storage.save_raw_players(players_df, date_tag)
-        except Exception as exc:
-            log.error("Ошибка сохранения на S3: %s", exc)
+        except Exception as e:
+            log.error("Ошибка сохранения данных на S3: %s", e)
+
+    updated_seen = seen_ids | successfully_fetched
+    save_seen_ids(updated_seen, storage=storage)
 
     return matches_df, players_df
 
@@ -216,15 +291,18 @@ if __name__ == "__main__":
         format="%(asctime)s %(levelname)-8s %(message)s",
     )
     parser = argparse.ArgumentParser(description="Fetch Tier-1 Dota 2 matches")
-    parser.add_argument("--days",      type=int,  default=90)
-    parser.add_argument("--dry-run",   action="store_true")
+    parser.add_argument(
+        "--days", type=int, default=None,
+        help="Ограничить по start_time (дней назад). "
+             "По умолчанию без ограничения — дедупликация через seen_ids.",
+    )
+    parser.add_argument("--dry-run",   action="store_true", help="Не скачивать детали")
+    parser.add_argument("--count-new", action="store_true", help="Вывести число новых матчей и выйти")
     parser.add_argument("--no-s3",     action="store_true")
     parser.add_argument("--no-local",  action="store_true")
     parser.add_argument("--local-dir", default=os.getenv("LOCAL_DATA_DIR", "data"))
-    parser.add_argument("--min-prize", type=int,  default=None,
-                        help=f"Минимальный призовой фонд USD (default: {MIN_PRIZE_POOL})")
-    parser.add_argument("--min-tier",  type=int,  default=None,
-                        help=f"Минимальный tier лиги (default: {MIN_TIER})")
+    parser.add_argument("--min-prize", type=int, default=None)
+    parser.add_argument("--min-tier",  type=int, default=None)
     args = parser.parse_args()
 
     if args.min_prize is not None:
@@ -235,6 +313,7 @@ if __name__ == "__main__":
     fetch_and_save(
         days_back=args.days,
         dry_run=args.dry_run,
+        count_new=args.count_new,
         save_local=not args.no_local,
         save_s3=not args.no_s3,
         local_dir=args.local_dir,

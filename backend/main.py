@@ -5,6 +5,10 @@ from backend.prediction.router import router as prediction_router
 from backend.auth.router import router as auth_router
 from backend.internal.router import router as internal_router
 from backend.database import setup_database
+
+from dotenv import load_dotenv
+
+load_dotenv()
 app = FastAPI()
 
 app.add_middleware(
