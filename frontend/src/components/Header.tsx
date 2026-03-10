@@ -39,6 +39,9 @@ const Header: React.FC = () => {
         <Link to="/" data-tab="predict">
           🏆 Предсказание
         </Link>
+        <Link to="/lastpick" data-tab="lastpick">
+        🔥 Ластпик
+        </Link>
       </nav>
       <button
         id="theme-toggle"

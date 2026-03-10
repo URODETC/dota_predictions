@@ -8,7 +8,7 @@ interface PredictionRequest {
 }
 
 export async function predictMatch(request: PredictionRequest): Promise<PredictionResult> {
-  const res = await fetch(`${API_BASE}/api/predict`, {
+  const res = await fetch(`${API_BASE}/predict`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

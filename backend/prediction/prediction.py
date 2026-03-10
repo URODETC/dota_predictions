@@ -22,7 +22,7 @@ def _build_model(artifacts: dict, linear_sd: dict, xgb_sd: dict) -> PredictionMo
     lm.load_state_dict(linear_sd)
     lm.eval()
 
-    xg = XGBModule(1, N_FEATURES, 1, params={})
+    xg = XGBModule(33094, N_FEATURES, 1, params={})
     xg.load_state_dict(xgb_sd)
     xg.eval()
 

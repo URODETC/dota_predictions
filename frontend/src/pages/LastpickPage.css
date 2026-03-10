@@ -1,0 +1,134 @@
+.lastpick-page {
+  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  color: #e2e8f0;
+}
+
+.lp-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.lp-header h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #4f46e5, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.lp-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 30px;
+}
+
+.lp-draft {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.side {
+  flex: 1;
+}
+
+.side-title {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 1px;
+}
+
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-target-slot {
+  height: 50px;
+  border: 2px dashed #4f46e5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+  font-weight: bold;
+  background: rgba(79, 70, 229, 0.05);
+}
+
+.lp-vs {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #334155;
+  padding: 0 20px;
+}
+
+.lp-analysis {
+  background: #0f172a;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #1e293b;
+}
+
+.analysis-title {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 10px;
+}
+
+.candidates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.candidate-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: #1e293b;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.candidate-item:hover {
+  transform: translateX(5px);
+}
+
+.hero-icon {
+  width: 45px;
+  height: 25px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.hero-name {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.winrate {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: bold;
+}
+
+.winrate.pos { color: #10b981; }
+.winrate.neg { color: #ef4444; }
+
+.lp-status {
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  padding: 20px;
+}

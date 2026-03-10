@@ -25,3 +25,8 @@ export interface PredictionResult {
     { Radiant: number; Dire: number; Time: number }
   ]
 }
+
+export interface LastpickCandidate {
+  hero_id: number;
+  winrate: number;
+}

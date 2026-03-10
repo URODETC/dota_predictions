@@ -22,3 +22,8 @@ class TimedResult(BaseModel):
 class PredictionOut(BaseModel):
     average: dict[str, float]
     detailed: list[TimedResult]
+
+class LastpickIn(BaseModel):
+    my_team: list[int]
+    enemy_team: list[int]
+    top_n: int = 20
