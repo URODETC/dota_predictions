@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import Terms from "./pages/Terms";
 import Authors from "./pages/Authors";
 import LastpickPage from "./pages/LastpickPage";
+
 import "./App.css";
 
 function App() {

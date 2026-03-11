@@ -1,134 +1,341 @@
-.lastpick-page {
-  padding: 40px 20px;
-  max-width: 1400px;
+.lp-page {
+  max-width: 1200px;
   margin: 0 auto;
-  color: #e2e8f0;
+  padding: 28px 20px 60px;
 }
 
+/* Header */
 .lp-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
-
-.lp-header h1 {
-  font-size: 2.5rem;
-  background: linear-gradient(90deg, #4f46e5, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+.lp-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--text);
 }
-
-.lp-content {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 30px;
-}
-
-.lp-draft {
-  background: #1e293b;
-  padding: 30px;
-  border-radius: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-}
-
-.side {
-  flex: 1;
-}
-
-.side-title {
-  margin-bottom: 20px;
+.lp-subtitle {
+  color: var(--text-muted);
   font-size: 0.9rem;
-  text-transform: uppercase;
-  color: #94a3b8;
-  letter-spacing: 1px;
+  margin: 0;
 }
 
-.slots {
+/* Main layout */
+.lp-layout {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.lp-column {
+  flex: 1;
+  min-width: 0;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.lp-target-slot {
-  height: 50px;
-  border: 2px dashed #4f46e5;
-  border-radius: 8px;
+.lp-vs {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4f46e5;
-  font-weight: bold;
-  background: rgba(79, 70, 229, 0.05);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  padding-top: 52px;
+  min-width: 44px;
+  letter-spacing: 2px;
+  flex-shrink: 0;
 }
 
-.lp-vs {
-  font-size: 2rem;
-  font-weight: 900;
-  color: #334155;
-  padding: 0 20px;
+.lp-team {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
 }
 
-.lp-analysis {
-  background: #0f172a;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid #1e293b;
-}
-
-.analysis-title {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #1e293b;
-  padding-bottom: 10px;
-}
-
-.candidates-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.candidate-item {
+.lp-team-header {
   display: flex;
   align-items: center;
-  padding: 10px;
-  background: #1e293b;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.lp-team-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+}
+
+.lp-team-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.lp-team-badge--my {
+  background: rgba(0, 255, 127, 0.12);
+  color: var(--good);
+  border: 1px solid rgba(0, 255, 127, 0.3);
+}
+.lp-team-badge--enemy {
+  background: rgba(255, 64, 64, 0.12);
+  color: var(--bad);
+  border: 1px solid rgba(255, 64, 64, 0.3);
+}
+
+.lp-hero-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.lp-suggestions {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+}
+
+.lp-suggestions-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 10px;
+}
+
+.lp-suggestions-loading {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.lp-mini-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.lp-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lp-sug-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
   border-radius: 8px;
-  transition: transform 0.2s;
+  background: color-mix(in srgb, var(--card) 60%, var(--bg));
+  border: 1px solid transparent;
+  animation: rowIn 0.2s ease both;
+  transition: background 0.15s, transform 0.15s;
+}
+.lp-sug-row:hover {
+  background: var(--search-hover);
+  transform: translateX(3px);
+}
+.lp-sug-row--top:nth-child(1) {
+  border-color: rgba(255, 215, 0, 0.35);
+  background: color-mix(in srgb, var(--card) 80%, rgba(255,215,0,0.1));
+}
+.lp-sug-row--top:nth-child(2) {
+  border-color: rgba(192, 192, 192, 0.3);
+}
+.lp-sug-row--top:nth-child(3) {
+  border-color: rgba(205, 127, 50, 0.3);
 }
 
-.candidate-item:hover {
-  transform: translateX(5px);
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.hero-icon {
-  width: 45px;
-  height: 25px;
+.lp-sug-rank {
+  width: 28px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+.lp-sug-row--top:nth-child(1) .lp-sug-rank { color: #ffd700; }
+.lp-sug-row--top:nth-child(2) .lp-sug-rank { color: #c0c0c0; }
+.lp-sug-row--top:nth-child(3) .lp-sug-rank { color: #cd7f32; }
+
+.lp-sug-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
-.hero-name {
+.lp-sug-name {
   flex: 1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lp-sug-bar-wrap {
+  width: 70px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.lp-sug-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--good));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.lp-sug-wr {
+  width: 46px;
+  text-align: right;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--good);
+  flex-shrink: 0;
+}
+
+.lp-clear-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.lp-btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 9px;
   font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+}
+.lp-btn--clear {
+  background: transparent;
+  color: var(--bad);
+  border: 1px solid rgba(255, 64, 64, 0.35);
+}
+.lp-btn--clear:hover {
+  background: rgba(255, 64, 64, 0.08);
+  transform: scale(1.03);
 }
 
-.winrate {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: bold;
+@media (max-width: 750px) {
+  .lp-layout {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .lp-column {
+    max-width: 100%;
+  }
+  .lp-vs {
+    padding-top: 0;
+    text-align: center;
+  }
 }
 
-.winrate.pos { color: #10b981; }
-.winrate.neg { color: #ef4444; }
+.lp-advantage {
+  max-width: 700px;
+  margin: 0 auto 24px;
+  background: var(--card);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+}
 
-.lp-status {
+.lp-advantage-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   text-align: center;
-  color: #64748b;
-  font-style: italic;
-  padding: 20px;
+  margin-bottom: 12px;
 }
+
+.lp-advantage-bar {
+  display: flex;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.lp-advantage-fill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease;
+  min-width: 40px;
+}
+
+.lp-advantage-fill--radiant {
+  background: linear-gradient(90deg, rgba(0,255,127,0.7), rgba(0,255,127,0.4));
+  border-radius: 8px 0 0 8px;
+}
+
+.lp-advantage-fill--dire {
+  background: linear-gradient(90deg, rgba(255,64,64,0.4), rgba(255,64,64,0.7));
+  border-radius: 0 8px 8px 0;
+}
+
+.lp-advantage-pct {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  white-space: nowrap;
+}
+
+.lp-advantage-teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.lp-advantage-team {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.lp-advantage-team--radiant { color: var(--good); }
+.lp-advantage-team--dire    { color: var(--bad); }
+
+.lp-advantage-winner {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.lp-advantage-winner--radiant { color: var(--good); }
+.lp-advantage-winner--dire    { color: var(--bad); }

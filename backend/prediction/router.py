@@ -30,7 +30,8 @@ def api_predict(data: PredictionIn) -> PredictionOut:
 def api_lastpick(data: LastpickIn):
     used = set(data.my_team + data.enemy_team)
     candidates = [h for h in range(1, 200) if h not in used]
-
+    from backend.prediction.prediction import get_pred
+    pred = get_pred()
     results = []
     for hero in candidates:
         full_team = data.my_team + [hero]
