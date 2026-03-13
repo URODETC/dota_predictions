@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from backend.prediction.schemas import PredictionIn, PredictionOut, TimedResult, LastpickIn
+from random import *
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 
@@ -26,28 +27,15 @@ def api_predict(data: PredictionIn) -> PredictionOut:
         ],
     )
 
+
+
 @router.post("/lastpick")
 def api_lastpick(data: LastpickIn):
+    from backend.prediction.prediction import get_last_pick
+    last = get_last_pick()
     used = set(data.my_team + data.enemy_team)
     candidates = [h for h in range(1, 200) if h not in used]
-    from backend.prediction.prediction import get_pred
-    pred = get_pred()
-    results = []
-    for hero in candidates:
-        full_team = data.my_team + [hero]
-        if len(full_team) < 5:
-            padding = [h for h in range(1, 200) if h not in used and h != hero]
-            full_team = full_team + padding[:5 - len(full_team)]
-        enemy = list(data.enemy_team)
-        if len(enemy) < 5:
-            padding = [h for h in range(1, 200) if h not in used and h != hero and h not in enemy]
-            enemy = enemy + padding[:5 - len(enemy)]
-        try:
-            result = pred.prediction(full_team[:5], enemy[:5])
-            avg_win = sum(r["Radiant"] for r in result) / len(result)
-            results.append({"hero_id": hero, "winrate": round(avg_win * 100, 1)})
-        except Exception:
-            continue
+    valuable = last.get_valuable_dict(data.my_team, data.enemy_team, data.pos, candidates)
+    results = [{"hero_id": k, "winrate": v} for k, v in valuable.items()]
 
-    results.sort(key=lambda x: x["winrate"], reverse=True)
     return results[:data.top_n]

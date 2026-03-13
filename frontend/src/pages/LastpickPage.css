@@ -51,6 +51,7 @@
   flex-shrink: 0;
 }
 
+/* Team cards */
 .lp-team {
   background: var(--card);
   border-radius: 12px;
@@ -99,6 +100,7 @@
   gap: 7px;
 }
 
+/* Suggestions panel */
 .lp-suggestions {
   background: var(--card);
   border-radius: 12px;
@@ -140,6 +142,7 @@
   gap: 5px;
 }
 
+/* Suggestion row */
 .lp-sug-row {
   display: flex;
   align-items: center;
@@ -225,6 +228,7 @@
   flex-shrink: 0;
 }
 
+/* Clear button */
 .lp-clear-wrap {
   display: flex;
   justify-content: center;
@@ -250,6 +254,7 @@
   transform: scale(1.03);
 }
 
+/* Responsive */
 @media (max-width: 750px) {
   .lp-layout {
     flex-direction: column;
@@ -264,6 +269,7 @@
   }
 }
 
+/* Advantage widget */
 .lp-advantage {
   max-width: 700px;
   margin: 0 auto 24px;
@@ -339,3 +345,52 @@
 
 .lp-advantage-winner--radiant { color: var(--good); }
 .lp-advantage-winner--dire    { color: var(--bad); }
+
+/* Position selector */
+.lp-pos-selector {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.lp-pos-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lp-pos-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.lp-pos-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 10px var(--predict-btn-shadow);
+}
+
+.lp-topn-selector {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.lp-pos-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 4px;
+}

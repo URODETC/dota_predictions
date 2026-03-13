@@ -10,7 +10,7 @@ import xgboost as xgb
 
 from shared.utils import _duration_to_category, _POSITION_WEIGHTS
 
-N_FEATURES = 10
+N_FEATURES = 7
 
 class PredictionModel:
     def __init__(
@@ -75,25 +75,22 @@ class PredictionModel:
         d_sup =   self.sup_synergy.get((dire[3], dire[4]), 0.0)
 
         results = []
-        for duration_cat in range(1,9):
+        for duration in range(1, 9):
             input_features = [
-                r_syn,
-                d_syn,
-                carry,
-                mid,
-                offlane,
-                r_sup,
-                d_sup,
-                self.time_strength(radiant, duration_cat, duration_cat),
-                self.time_strength(dire, duration_cat, duration_cat),
-                csyn,
-            ]
+            r_syn - d_syn,
+            carry,
+            mid,
+            offlane,
+            r_sup - d_sup,
+            self.time_strength(radiant, duration, duration) - self.time_strength(dire, duration, duration),
+            csyn
+        ]
             X_tensor = torch.tensor([input_features], dtype=torch.float32)
             X_dmatrix = xgb.DMatrix(X_tensor.numpy())
             with torch.no_grad():
                 pred = self.linear_model(X_tensor) * 0.4 + 0.6 * self.xgb_model(X_dmatrix)
                 prob_rad = torch.sigmoid(pred).item()
-            results.append({"Radiant": prob_rad, "Dire": 1 - prob_rad, "Time": duration_cat})
+            results.append({"Radiant": prob_rad, "Dire": 1 - prob_rad, "Time": duration})
 
         return results
 
@@ -183,15 +180,12 @@ class Lastpicker:
 
         for duration in range(1, 9):
             input_features = [
-            r_synergy_val,
-            d_synergy_val,
-            self.time_strenght(radiant, duration, duration),
-            self.time_strenght(dire, duration, duration),
+            r_synergy_val - d_synergy_val,
             carry,
             mid,
             offlane,
-            rsup,
-            dsup,
+            rsup - dsup,
+            self.time_strenght(radiant, duration, duration) - self.time_strenght(dire, duration, duration),
             csynergy_val
         ]
 
@@ -244,8 +238,12 @@ class Lastpicker:
                 continue
             own_team_ready.insert(pos - 1, hero)
             pick_strength = self.prediction(own_team_ready, enemy_team_ready)
-            valuable_dict[hero] = int(pick_strength * 100)
+            if self.hero_pos_weight[hero][pos] > 0.4:
+                if pos == 4 and hero == 1:
+                    continue
+                valuable_dict[hero] = int(pick_strength * 100)
             del own_team_ready[pos - 1]
         valuable_dict = self.sort_dict(valuable_dict)
 
         return valuable_dict
+    

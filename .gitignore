@@ -12,3 +12,4 @@ frontend/dist/
 frontend/.next/
 .env
 .idea/
+start_serv.bat

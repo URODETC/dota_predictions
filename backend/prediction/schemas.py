@@ -27,3 +27,4 @@ class LastpickIn(BaseModel):
     my_team: list[int]
     enemy_team: list[int]
     top_n: int = 20
+    pos: int = 1

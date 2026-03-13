@@ -8,13 +8,14 @@ import joblib
 import torch
 from gbnet.xgbmodule import XGBModule
 
-from shared.models import PredictionModel, N_FEATURES
+from shared.models import PredictionModel, Lastpicker, N_FEATURES
 
 log = logging.getLogger(__name__)
 
 MODEL_DIR = os.getenv("MODEL_DIR", "model")
 
 _pred: PredictionModel | None = None
+_last: Lastpicker | None = None
 _lock = threading.Lock()
 
 def _build_model(artifacts: dict, linear_sd: dict, xgb_sd: dict) -> PredictionModel:
@@ -86,3 +87,33 @@ def get_pred() -> PredictionModel:
             if _pred is None:
                 _pred = _load_model()
     return _pred
+
+def get_last_pick() -> Lastpicker:
+    global _last
+    if _last is None:
+        with _lock:
+            if _last is None:
+                artifacts = joblib.load(f"{MODEL_DIR}/artifacts.pkl")
+                pos_weights = artifacts["hero_pos_prob"]
+                
+                lm = torch.nn.Linear(N_FEATURES, 1)
+                lm.load_state_dict(torch.load(f"{MODEL_DIR}/linear.pth", weights_only=False, map_location="cpu"))
+                lm.eval()
+
+                xg = XGBModule(33094, N_FEATURES, 1, params={})
+                xg.load_state_dict(torch.load(f"{MODEL_DIR}/xgb.pth", weights_only=False, map_location="cpu"))
+                xg.eval()
+
+                _last = Lastpicker(
+                    carry=artifacts["carry_matchup"],
+                    mid=artifacts["mid_matchup"],
+                    offlane=artifacts["offlane_matchup"],
+                    sups=artifacts["sup_synergy"],
+                    synergy=artifacts["pair_synergy"],
+                    matchup_synergy=artifacts["matchup_synergy"],
+                    time_strength=artifacts["hero_stats_time"],
+                    hero_pos_weight=pos_weights,
+                    xgb_model=xg,
+                    linear_model=lm,
+                )
+    return _last
