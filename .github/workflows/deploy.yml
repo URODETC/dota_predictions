@@ -74,7 +74,7 @@ jobs:
           envs: TAG,ROLLBACK_VERSION,INTERNAL_TOKEN,BACKEND_URL
           script: |
             set -euo pipefail
-            cd /var/www/dota-predictions
+            cd /var/www/dota_predictions
             echo "▶ Pulling code"
             git pull origin main
             
