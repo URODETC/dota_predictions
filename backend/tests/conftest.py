@@ -1,11 +1,12 @@
 import asyncio
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-import numpy as np
+import dotenv
 import pytest
 import torch
 
+dotenv.load_dotenv()
 FAKE_ARTIFACTS = {
     "carry_matchup":   {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
     "matchup_synergy": {(i, j): 0.02 for i in range(1, 15) for j in range(1, 15)},
@@ -77,6 +78,7 @@ async def db_session(test_engine):
 @pytest.fixture(scope="module")
 def app_with_db(test_engine):
     from sqlalchemy.ext.asyncio import AsyncSession
+
     from backend.database import get_db
     from backend.main import app
 

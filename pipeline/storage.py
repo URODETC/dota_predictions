@@ -3,14 +3,14 @@ from __future__ import annotations
 import io
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import boto3
+import dotenv
 import joblib
 import torch
 from botocore.exceptions import ClientError
-import dotenv
 
 dotenv.load_dotenv()
 
@@ -103,7 +103,6 @@ class S3Storage:
         return json.loads(self._get(key))
 
     def _put_parquet(self, key: str, df) -> None:
-        import pandas as pd
         buf = io.BytesIO()
         df.to_parquet(buf, index=False)
         self._put(key, buf.getvalue())
@@ -152,7 +151,7 @@ class S3Storage:
             "version": version,
             "status": "candidate",
             "metrics": metrics,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "promoted_at": None,
         }
         self._put_json(_META.format(version=version), meta)
@@ -166,7 +165,7 @@ class S3Storage:
         meta_key = _META.format(version=version)
         meta = self._get_json(meta_key)
         meta["status"] = "production"
-        meta["promoted_at"] = datetime.now(timezone.utc).isoformat()
+        meta["promoted_at"] = datetime.now(UTC).isoformat()
         self._put_json(meta_key, meta)
 
         self._put_json(_PRODUCTION, {"version": version, "updated_at": meta["promoted_at"]})

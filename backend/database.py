@@ -1,6 +1,7 @@
+from os import getenv
+
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Mapped, declarative_base, mapped_column
-from os import getenv
 
 engine = create_async_engine(getenv("DATABASE_URL"))
 new_session = async_sessionmaker(engine, expire_on_commit=False)

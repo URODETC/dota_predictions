@@ -2,13 +2,14 @@
     r_syn, d_syn, carry, mid, offlane, r_sup, d_sup, r_time, d_time, csyn
 """
 from __future__ import annotations
+
 from itertools import combinations, product
 
 import numpy as np
 import torch
 import xgboost as xgb
 
-from shared.utils import _duration_to_category, _POSITION_WEIGHTS
+from shared.utils import _POSITION_WEIGHTS, _duration_to_category
 
 N_FEATURES = 7
 

@@ -52,6 +52,7 @@ torch = { index = "pytorch-cpu" }
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["backend/tests"]
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100

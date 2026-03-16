@@ -1,12 +1,14 @@
 from datetime import timedelta
+from os import getenv
+
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.auth import schemas
 from backend.auth.dependencies import get_current_user
-from backend.auth.security import verify_password, create_access_token, get_password_hash
-from os import getenv
-from backend.database import get_db, User
+from backend.auth.security import create_access_token, get_password_hash, verify_password
+from backend.database import User, get_db
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

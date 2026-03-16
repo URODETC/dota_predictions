@@ -8,7 +8,7 @@ import joblib
 import torch
 from gbnet.xgbmodule import XGBModule
 
-from shared.models import PredictionModel, Lastpicker, N_FEATURES
+from shared.models import N_FEATURES, Lastpicker, PredictionModel
 
 log = logging.getLogger(__name__)
 

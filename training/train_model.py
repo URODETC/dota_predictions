@@ -7,7 +7,7 @@ import pandas as pd
 import torch
 import xgboost as xgb
 from gbnet import xgbmodule
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 from shared.models import N_FEATURES
 from shared.utils import build_features

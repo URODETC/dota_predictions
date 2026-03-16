@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 
-from fastapi import APIRouter, HTTPException, status, Header
+from fastapi import APIRouter, Header, HTTPException, status
 
 from backend.internal.schemas import PromoteIn, RollbackIn
 

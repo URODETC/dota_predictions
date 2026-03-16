@@ -4,7 +4,7 @@ import argparse
 import logging
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -20,7 +20,6 @@ def compute_metrics(
         X_tensor: torch.Tensor,
         y_tensor: torch.Tensor,
 ) -> dict[str, float]:
-    from gbnet.xgbmodule import XGBModule
     X_dm = xgb.DMatrix(X_tensor.numpy())
 
     with torch.no_grad():
@@ -92,19 +91,24 @@ def run(
         linear_epochs: int = 15,
         xgb_iters: int = 15,
 ) -> dict[str, float]:
-    version = version or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
+    version = version or datetime.now(UTC).strftime("%Y%m%d_%H%M")
     Path(local_data_dir).mkdir(parents=True, exist_ok=True)
 
     log.info("=== Train pipeline  version=%s ===", version)
     players, matches = load_training_data(local_data_dir, use_s3)
 
-    from training.build_stats import (
-        preprocess, build_teams,
-        build_pos_stats, build_lane_matchup_stats,
-        build_pair_and_matchup_synergy, build_hero_stats_time,
-        build_hero_pos_weight, fill_missing,
-    )
     import joblib
+
+    from training.build_stats import (
+        build_hero_pos_weight,
+        build_hero_stats_time,
+        build_lane_matchup_stats,
+        build_pair_and_matchup_synergy,
+        build_pos_stats,
+        build_teams,
+        fill_missing,
+        preprocess,
+    )
 
     log.info("Предобработка...")
     df = preprocess(players, matches)
@@ -132,8 +136,8 @@ def run(
         "hero_pos_prob": hero_pos_w,
     }
 
-    from shared.utils import build_features
     from shared.models import N_FEATURES
+    from shared.utils import build_features
 
     log.info("Построение признаков...")
     X = build_features(

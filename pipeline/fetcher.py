@@ -5,7 +5,7 @@ import json
 import logging
 import os
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -197,7 +197,7 @@ def fetch_and_save(
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     since_ts = 0
     if days_back is not None:
-        since_ts = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
+        since_ts = int((datetime.now(UTC) - timedelta(days=days_back)).timestamp())
         log.info("Ограничение по времени: последние %d дней", days_back)
 
     storage = None
@@ -264,7 +264,7 @@ def fetch_and_save(
         len(matches_df), len(players_df),
     )
 
-    date_tag = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    date_tag = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
 
     if save_local:
         Path(local_dir).mkdir(parents=True, exist_ok=True)

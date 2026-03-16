@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from backend.prediction.schemas import PredictionIn, PredictionOut, TimedResult, LastpickIn
-from random import *
+
+from backend.prediction.schemas import LastpickIn, PredictionIn, PredictionOut, TimedResult
 
 router = APIRouter(prefix="/predict", tags=["Prediction"])
 

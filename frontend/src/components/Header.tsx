@@ -15,7 +15,7 @@ const Header: React.FC = () => {
       )
         return "light";
     } catch (e) {
-      // ignore
+      console.log(e)
     }
     return "dark";
   });
@@ -26,7 +26,7 @@ const Header: React.FC = () => {
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch (e) {
-      // ignore
+      console.log(e)
     }
   }, [theme]);
 

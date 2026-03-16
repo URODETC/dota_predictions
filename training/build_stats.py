@@ -6,10 +6,9 @@ from itertools import combinations, product
 from pathlib import Path
 
 import joblib
-import numpy as np
 import pandas as pd
 
-from shared.utils import sort_dict, dict_to_hero_list, _duration_to_category
+from shared.utils import _duration_to_category, dict_to_hero_list, sort_dict
 
 
 def load_raw_data(data_dir: str = "data") -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -44,7 +43,7 @@ def preprocess(players: pd.DataFrame, matches: pd.DataFrame) -> pd.DataFrame:
             df.rename(columns={src: dst}, inplace=True)
 
     df["teams"] = (df["isRadiant" == True]).astype(int)
-    df["radiant_win"] = (df["radiant_win"] == True).astype(int)
+    df["radiant_win"] = df["radiant_win"].astype(int)
 
     keep = ["match_id", "hero_id", "player_slot", "teams",
             "win", "radiant_win", "duration", "gold_t", "lane_role"]
@@ -242,7 +241,8 @@ def build_hero_stats_time(teams: pd.DataFrame) -> dict:
             for hero in heroes:
                 raw.setdefault(hero, {i: {"matches": 0, "wins": 0} for i in range(1, 9)})
                 raw[hero][cat]["matches"] += 1
-                if won: raw[hero][cat]["wins"] += 1
+                if won:
+                    raw[hero][cat]["wins"] += 1
 
     for hero, times in raw.items():
         tm = sum(s["matches"] for s in times.values())

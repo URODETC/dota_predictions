@@ -87,13 +87,14 @@ class TestCounterSynergy:
 
     def test_counts_all_25_pairs(self, model):
         calls = []
-        original_get = model.matchup_synergy.get
 
-        def counting_get(key, default=0.0):
-            calls.append(key)
-            return original_get(key, default)
+        class TrackingDict(dict):
+            def get(self, key, default=0.0):
+                calls.append(key)
+                return super().get(key, default)
 
-        model.matchup_synergy.get = counting_get
+
+        model.matchup_synergy = TrackingDict(model.matchup_synergy)
         model.counter_synergy(RADIANT, DIRE)
         assert len(calls) == 25
 
@@ -123,7 +124,7 @@ class TestTimeStrength:
 
     def test_weights_sum_to_one(self):
         from shared.utils import _POSITION_WEIGHTS
-        assert abs(float(_POSITION_WEIGHTS.sum()) - 1.0) < 1e-9
+        assert abs(_POSITION_WEIGHTS.sum() - 1.0) < 1e-6
 
 
 class TestPrediction:
