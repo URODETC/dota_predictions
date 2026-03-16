@@ -14,11 +14,7 @@ env:
   IMAGE_PREFIX: ghcr.io/urodetc
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
-
   build-and-push:
-    needs: ci
     if: github.event.inputs.rollback_version == ''
     runs-on: ubuntu-latest
     permissions:
