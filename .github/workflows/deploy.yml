@@ -51,14 +51,12 @@ jobs:
         with:
           context: ./frontend
           file: frontend/Dockerfile
-          target: production
           push: true
           tags: |
             ${{ env.IMAGE_PREFIX }}/dota-predictions-frontend:latest
             ${{ env.IMAGE_PREFIX }}/dota-predictions-frontend:${{ github.sha }}
   deploy:
     needs: build-and-push
-    if: always() && needs.ci.result == 'success'
     runs-on: ubuntu-latest
     environment: production
     steps:
