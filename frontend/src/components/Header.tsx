@@ -15,7 +15,7 @@ const Header: React.FC = () => {
       )
         return "light";
     } catch (e) {
-      // ignore
+      console.log(e)
     }
     return "dark";
   });
@@ -26,7 +26,7 @@ const Header: React.FC = () => {
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch (e) {
-      // ignore
+      console.log(e)
     }
   }, [theme]);
 
@@ -38,6 +38,9 @@ const Header: React.FC = () => {
       <nav>
         <Link to="/" data-tab="predict">
           🏆 Предсказание
+        </Link>
+        <Link to="/lastpick" data-tab="lastpick">
+        🔥 Ластпик
         </Link>
       </nav>
       <button

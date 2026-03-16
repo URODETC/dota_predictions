@@ -1,10 +1,11 @@
-from fastapi import Request, HTTPException, Depends
-from jose import jwt, JWTError
+from os import getenv
+
+from fastapi import Depends, HTTPException, Request
+from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.config import settings
-from backend.database import get_db, User
+from backend.database import User, get_db
 
 
 async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)):
@@ -13,7 +14,7 @@ async def get_current_user(request: Request, db: AsyncSession = Depends(get_db))
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY)
+        payload = jwt.decode(token, getenv("SECRET_KEY"))
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")

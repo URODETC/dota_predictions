@@ -4,6 +4,8 @@ import MainPage from "./pages/MainPage";
 import Footer from "./components/Footer";
 import Terms from "./pages/Terms";
 import Authors from "./pages/Authors";
+import LastpickPage from "./pages/LastpickPage";
+
 import "./App.css";
 
 function App() {
@@ -15,6 +17,7 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/authors" element={<Authors />} />
+          <Route path="/lastpick" element={<LastpickPage />} />
         </Routes>
       </main>
       <Footer />

@@ -1,0 +1,123 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      rollback_version:
+        description: "Откатить модель на версию (пусто = деплой HEAD)"
+        required: false
+        default: ""
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/urodetc
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  build-and-push:
+    needs: ci
+    if: github.event.inputs.rollback_version == ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: extract tag
+        id: meta
+        run: echo "version=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/dota-predictions-backend:latest
+            ${{ env.IMAGE_PREFIX }}/dota-predictions-backend:${{ github.sha }}
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: frontend/Dockerfile
+          target: production
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/dota-predictions-frontend:latest
+            ${{ env.IMAGE_PREFIX }}/dota-predictions-frontend:${{ github.sha }}
+  deploy:
+    needs: build-and-push
+    if: always() && needs.ci.result == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy via ssh
+        uses: appleboy/ssh-action@v1
+        env:
+          TAG: ${{ needs.build-and-push.outputs.tag || 'latest' }}
+          ROLLBACK_VERSION: ${{ github.event.inputs.rollback_version }}
+          INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
+          BACKEND_URL: ${{ secrets.BACKEND_INTERNAL_URL }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: TAG,ROLLBACK_VERSION,INTERNAL_TOKEN,BACKEND_URL
+          script: |
+            set -euo pipefail
+            cd /var/www/dota-predictions
+            echo "▶ Pulling code"
+            git pull origin main
+            
+            set -a && source /etc/dota/.env && set +a
+            
+            if [ -n "$ROLLBACK_VERSION" ]; then
+              echo "Откат модели → $ROLLBACK_VERSION"
+              python scripts/rollback.py --version "$ROLLBACK_VERSION"
+              curl -sf -X POST "${BACKEND_URL}/internal/reload" \
+                -H "X-Internal-Token: ${INTERNAL_TOKEN}" && echo "hot-reload ok"
+              exit 0
+            fi
+            
+            echo "▶ Pulling new images (tag: ${{ needs.build-and-push.outputs.tag }})"
+            TAG=$TAG docker compose -f docker-compose-prod.yml pull backend frontend
+            
+            echo "▶ Restarting services
+            echo "▶ Restart backend"
+            TAG=$TAG docker compose -f docker-compose-prod.yml up -d \
+              --no-deps --wait --wait-timeout 120 backend
+            
+            echo "▶ Hot-reload модели из S3"
+            curl -sf -X POST "${BACKEND_URL}/internal/reload" \
+              -H "X-Internal-Token: ${INTERNAL_TOKEN}" || echo "warn: reload failed"
+
+            echo "▶ Restart frontend"
+            TAG=$TAG docker compose -f docker-compose-prod.yml up -d \
+              --no-deps --wait --wait-timeout 60 frontend
+
+            echo "▶ Healthcheck"
+            for i in $(seq 1 6); do
+              STATUS=$(curl -sf "${BACKEND_URL}/health" \
+                | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || echo fail)
+              [ "$STATUS" = "ok" ] && { echo "✅ healthy (attempt $i)"; break; }
+              [ "$i" = "6" ] && { echo "❌ Unhealthy — rollback image"; TAG=latest docker compose -f docker-compose-prod.yml up -d --no-deps backend; exit 1; }
+              sleep 10
+            done
+
+            docker image prune -f
+            echo "✅ Deploy complete tag=$TAG"

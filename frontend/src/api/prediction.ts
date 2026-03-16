@@ -1,6 +1,6 @@
 import type { PredictionResult } from '../types';
 
-const API_BASE = 'https://dota-predictions.ru';
+const API_BASE = import.meta.env.VITE_API_BASE ?? 'http://localhost:8000';
 
 interface PredictionRequest {
   team1: number[];
@@ -8,7 +8,7 @@ interface PredictionRequest {
 }
 
 export async function predictMatch(request: PredictionRequest): Promise<PredictionResult> {
-  const res = await fetch(`${API_BASE}/api/predict`, {
+  const res = await fetch(`${API_BASE}/predict`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
