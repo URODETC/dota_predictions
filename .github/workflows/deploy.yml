@@ -21,7 +21,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      tag: ${{ steps.meta.outputs.version }}
+      tag: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
 
