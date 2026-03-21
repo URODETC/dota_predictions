@@ -1,17 +1,16 @@
 """
-    r_syn, d_syn, carry, mid, offlane, r_sup, d_sup, r_time, d_time, csyn
+    r_syn - d_syn, carry, mid, offlane, r_sup - d_sup, r_time - d_time, csyn
 """
 from __future__ import annotations
 
 from itertools import combinations, product
 
 import numpy as np
-import torch
-import xgboost as xgb
 
 from shared.utils import _POSITION_WEIGHTS, _duration_to_category
 
 N_FEATURES = 7
+
 
 class PredictionModel:
     def __init__(
@@ -23,8 +22,7 @@ class PredictionModel:
             matchup_synergy: dict,
             hero_stats_time: dict,
             sup_synergy: dict,
-            xgb_model,
-            linear_model,
+            catboost_model,
     ):
         self.carry_matchup = carry_matchup
         self.mid_matchup = mid_matchup
@@ -33,8 +31,7 @@ class PredictionModel:
         self.matchup_synergy = matchup_synergy
         self.hero_stats_time = hero_stats_time
         self.sup_synergy = sup_synergy
-        self.xgb_model = xgb_model
-        self.linear_model = linear_model
+        self.catboost_model = catboost_model
 
     def synergy(self, team: list) -> float:
         team = np.sort(np.array(team, dtype=np.int16))
@@ -66,47 +63,49 @@ class PredictionModel:
         return float(values.sum())
 
     def prediction(self, radiant: list, dire: list) -> list[dict]:
-        r_syn =   self.synergy(radiant)
-        d_syn =   self.synergy(dire)
-        csyn =    self.counter_synergy(radiant, dire)
-        carry =   self.carry_matchup.get((radiant[0], dire[0]), 0.0)
-        mid =     self.mid_matchup.get((radiant[1], dire[1]), 0.0)
+        r_syn = self.synergy(radiant)
+        d_syn = self.synergy(dire)
+        csyn = self.counter_synergy(radiant, dire)
+        carry = self.carry_matchup.get((radiant[0], dire[0]), 0.0)
+        mid = self.mid_matchup.get((radiant[1], dire[1]), 0.0)
         offlane = self.offlane_matchup.get((radiant[2], dire[2]), 0.0)
-        r_sup =   self.sup_synergy.get((radiant[3], radiant[4]), 0.0)
-        d_sup =   self.sup_synergy.get((dire[3], dire[4]), 0.0)
+        r_sup = self.sup_synergy.get((radiant[3], radiant[4]), 0.0)
+        d_sup = self.sup_synergy.get((dire[3], dire[4]), 0.0)
 
-        results = []
-        for duration in range(1, 9):
-            input_features = [
-            r_syn - d_syn,
-            carry,
-            mid,
-            offlane,
-            r_sup - d_sup,
-            self.time_strength(radiant, duration, duration) - self.time_strength(dire, duration, duration),
-            csyn
+        time = np.array([
+            self.time_strength(radiant, 0, cat) - self.time_strength(dire, 0, cat) for cat in range(1, 9)],
+            dtype=np.float32,
+        )
+        static = np.array(
+            [r_syn - d_syn, carry, mid, offlane, r_sup - d_sup, csyn],
+            dtype=np.float32,
+        )
+        X = np.column_stack([
+            np.broadcast_to(static[:5], (8, 5)),
+            time,
+            np.broadcast_to(static[5], (8,)),
+        ]).astype(np.float32)
+
+        probs = self.catboost_model.predict(X, prediction_type="Probability")[:, 1]
+
+        return [
+            {"Radiant": float(probs[i]), "Dire": float(1.0 - probs[i]), "Time": i + 1}
+            for i in range(8)
         ]
-            X_tensor = torch.tensor([input_features], dtype=torch.float32)
-            X_dmatrix = xgb.DMatrix(X_tensor.numpy())
-            with torch.no_grad():
-                pred = self.linear_model(X_tensor) * 0.4 + 0.6 * self.xgb_model(X_dmatrix)
-                prob_rad = torch.sigmoid(pred).item()
-            results.append({"Radiant": prob_rad, "Dire": 1 - prob_rad, "Time": duration})
 
-        return results
 
 class Lastpicker:
-    def __init__(self, 
-                 carry: dict, 
-                 mid: dict, 
-                 offlane: dict, 
+    def __init__(self,
+                 carry: dict,
+                 mid: dict,
+                 offlane: dict,
                  sups: dict,
-                 synergy: dict, 
-                 matchup_synergy: dict, 
-                 time_strength: dict, 
-                 hero_pos_weight: dict, 
-                 xgb_model: dict, 
-                 linear_model: dict):
+                 synergy: dict,
+                 matchup_synergy: dict,
+                 time_strength: dict,
+                 hero_pos_weight: dict,
+                 catboost_model,
+                 ):
         self.carry = carry
         self.mid = mid
         self.offlane = offlane
@@ -114,17 +113,15 @@ class Lastpicker:
         self.pair_synergy = synergy
         self.matchup_synergy = matchup_synergy
         self.hero_time_strenght = time_strength
-        self.xbg_model = xgb_model
-        self.linear_model = linear_model
+        self.catboost_model = catboost_model
         self.hero_pos_weight = hero_pos_weight
 
     def sort_dict(self, dictionary: dict):
-        a = sorted(dictionary.items(), key = lambda x: x[1], reverse=True)
+        a = sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
         end_dict = {}
         for i in a:
             end_dict[i[0]] = i[1]
         return end_dict
-
 
     def synergy(self, team: list):
         team = np.sort(np.array(team, dtype=np.int16))
@@ -136,37 +133,24 @@ class Lastpicker:
         )
         return values.mean()
 
-    def counter_synergy(self, radiant:list, dire:list):
+    def counter_synergy(self, radiant: list, dire: list):
         values = np.fromiter(
             (self.matchup_synergy.get((a, b), 0.0) for a, b in product(radiant, dire)),
             dtype=np.float32
         )
         return values.mean()
 
-    def time_strenght(self, team: list, duration: int, duration_ind: int = 0):
-        distribution = [.2,.2,.2,.2,.2,.2]
-        if duration_ind == 0:
-            if duration < 25:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(1, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 25 and duration < 30:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(2, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 30 and duration < 32.5:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(3, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 32.5 and duration < 35:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(4, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 35 and duration < 37.5:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(5, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 37.5 and duration < 40:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(6, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 40 and duration < 50:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(7, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-            elif duration >= 50:
-                values = np.array([self.hero_time_strenght.get(a, {}).get(8, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-        else:
-            values = np.array([self.hero_time_strenght.get(a, {}).get(duration_ind, 0.0) * distribution[k] for k, a in enumerate(team)], dtype=np.float32)
-        return values.sum()
+    def time_strength(self, team: list, duration: float, duration_ind: int = 0) -> float:
+        cat = int(duration_ind) if duration_ind > 0 else int(_duration_to_category(duration))
+        values = np.array(
+            [
+                self.hero_stats_time.get(a, {}).get(cat, 0.0) * _POSITION_WEIGHTS[k]
+                for k, a in enumerate(team)
+            ],
+            dtype=np.float32,
+        )
+        return float(values.sum())
 
-    
     def prediction(self, radiant, dire):
         r_synergy_val = self.synergy(radiant)
         d_synergy_val = self.synergy(dire)
@@ -180,37 +164,31 @@ class Lastpicker:
         results = []
 
         for duration in range(1, 9):
-            input_features = [
-            r_synergy_val - d_synergy_val,
-            carry,
-            mid,
-            offlane,
-            rsup - dsup,
-            self.time_strenght(radiant, duration, duration) - self.time_strenght(dire, duration, duration),
-            csynergy_val
-        ]
 
-            X_tensor = torch.tensor([input_features], dtype=torch.float32)
-            X_dmatrix = xgb.DMatrix(X_tensor)
-            with torch.no_grad():
-                pred_tensor = self.linear_model(X_tensor) * .4 + .6 * self.xbg_model(X_dmatrix) 
-                prob_radiant = torch.sigmoid(pred_tensor).item() 
-                prob_dire = 1 - prob_radiant
+            prob = self.catboost_model.predict([
+                r_synergy_val - d_synergy_val,
+                carry,
+                mid,
+                offlane,
+                rsup - dsup,
+                self.time_strength(radiant, duration, duration) - self.time_strength(dire, duration, duration),
+                csynergy_val
+            ], prediction_type="Probability")[:, 1]
 
             results.append({
-                "Radiant": prob_radiant,
-                "Dire": prob_dire,
+                "Radiant": prob,
+                "Dire": 1 - prob,
                 "Time": duration
             })
             total_radiant, total_dire = 0, 0
             for result in results:
                 total_radiant += result["Radiant"]
-                total_dire += result["Dire"]                                                
+                total_dire += result["Dire"]
 
             probability = total_radiant / (total_radiant + total_dire)
 
-        return probability   
-    
+        return probability
+
     def get_pos_existing(self, team, pos_ext=10):
         team_ready = []
         all_dated = []
@@ -229,7 +207,6 @@ class Lastpicker:
             team_ready.append(hh)
         return team_ready
 
-
     def get_valuable_dict(self, own_team, enemy_team, pos, pul):
         valuable_dict = {}
         own_team_ready = self.get_pos_existing(own_team, pos)
@@ -247,4 +224,3 @@ class Lastpicker:
         valuable_dict = self.sort_dict(valuable_dict)
 
         return valuable_dict
-    

@@ -1,12 +1,16 @@
 import asyncio
 import os
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-import dotenv
+import numpy as np
 import pytest
-import torch
 
-dotenv.load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 FAKE_ARTIFACTS = {
     "carry_matchup":   {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
     "matchup_synergy": {(i, j): 0.02 for i in range(1, 15) for j in range(1, 15)},
@@ -17,21 +21,17 @@ FAKE_ARTIFACTS = {
     "sup_synergy":     {(i, j): 0.0 for i in range(1, 15) for j in range(1, 15)},
 }
 
+_fake_cb = MagicMock()
+_fake_cb.predict.side_effect = lambda X, **kw: np.full((len(X), 2), [0.4, 0.6])
+_fake_cb.load_model = MagicMock()
 
 patch("joblib.load", return_value=FAKE_ARTIFACTS).start()
-
-_FAKE_LINEAR_SD = {
-    "weight": torch.zeros(1, 10),
-    "bias":   torch.zeros(1),
-}
-patch("torch.load",  return_value=_FAKE_LINEAR_SD).start()
-
-patch("gbnet.xgbmodule.XGBModule.load_state_dict", return_value=None).start()
+patch("catboost.CatBoostClassifier", return_value=_fake_cb).start()
 
 def get_test_db_url() -> str:
     url = os.getenv("DATABASE_URL")
     if url:
-        return url   # CI: реальный postgres
+        return url
     return "sqlite+aiosqlite:///:memory:"
 
 

@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 
+
 def cmd_list() -> None:
     from pipeline.storage import get_storage
     storage = get_storage()

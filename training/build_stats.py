@@ -42,7 +42,7 @@ def preprocess(players: pd.DataFrame, matches: pd.DataFrame) -> pd.DataFrame:
         if src in df.columns:
             df.rename(columns={src: dst}, inplace=True)
 
-    df["teams"] = (df["isRadiant" == True]).astype(int)
+    df["teams"] = df["isRadiant"].astype(int)
     df["radiant_win"] = df["radiant_win"].astype(int)
 
     keep = ["match_id", "hero_id", "player_slot", "teams",
@@ -53,7 +53,9 @@ def preprocess(players: pd.DataFrame, matches: pd.DataFrame) -> pd.DataFrame:
         df["gold_t"] = df["gold_t"].apply(
             lambda x: ast.literal_eval(x) if isinstance(x, str) else x
         )
-    df["id"] = df[df["gold_t"].apply(len) >= 15].copy()
+    df = df[df["gold_t"].apply(len) >= 15].copy()
+
+    df["id"] = df.groupby("match_id").ngroup()
     df["gold10"] = df["gold_t"].apply(lambda x: x[10])
 
     df = df.sort_values(["id", "teams", "lane_role", "gold10"])

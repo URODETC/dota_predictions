@@ -6,6 +6,11 @@ from backend.database import setup_database
 from backend.internal.router import router as internal_router
 from backend.prediction.router import router as prediction_router
 
+try:
+    import dotenv
+    dotenv.load_dotenv()
+except ImportError:
+    pass
 app = FastAPI()
 
 app.add_middleware(

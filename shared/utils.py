@@ -121,6 +121,4 @@ def build_features(
         "sup_synergy": r_sup - d_sup,
         "r_time": r_time - d_time,
         "csynergy": csyn,
-        "r_syn_raw": r_syn,
-        "d_syn_raw": d_syn,
     })

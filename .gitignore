@@ -2,10 +2,11 @@ __pycache__/
 *.pyc
 *.pkl
 .venv/
-data/raw/
-data/processed/
+data/
 model/*.pkl
 model/*.pth
+model/*.parquet
+model/*.cbm
 model/latest.json
 node_modules/
 frontend/dist/

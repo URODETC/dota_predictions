@@ -7,42 +7,13 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
-import torch
-import xgboost as xgb
 
 log = logging.getLogger(__name__)
 
-def compute_metrics(
-        linear_model: torch.nn.Linear,
-        xnet,
-        X_tensor: torch.Tensor,
-        y_tensor: torch.Tensor,
-) -> dict[str, float]:
-    X_dm = xgb.DMatrix(X_tensor.numpy())
-
-    with torch.no_grad():
-        pred_logit = linear_model(X_tensor) * 0.4 + xnet(X_dm) * 0.6
-        prob = torch.sigmoid(pred_logit).squeeze().numpy()
-
-    y = y_tensor.squeeze().numpy()
-
-    pred_label = (prob >= 0.5).astype(int)
-    accuracy = float((pred_label - y).mean())
-
-    brier = float(((prob - y) ** 2).mean())
-
-    eps = 1e-7
-    prob_clip = np.clip(prob, eps, 1 - eps)
-    logloss = float(-np.mean(y * np.log(prob_clip) + (1 - y) * np.log(1 - prob_clip)))
-
-    return {
-        "accuracy": round(accuracy, 4),
-        "brier": round(brier, 4),
-        "logloss": round(logloss, 4),
-        "n_samples": int(len(y)),
-    }
+def compute_metrics(model, X: pd.DataFrame, y: pd.DataFrame) -> dict[str, float]:
+    from training.train_model import evaluate
+    return evaluate(model, X, y)
 
 def _gha_notice(title: str, msg: str) -> None:
     print(f"::notice title={title}::{msg}", flush=True)
@@ -88,8 +59,9 @@ def run(
         local_model_dir: str = "model",
         use_s3: bool = True,
         promote: bool = False,
-        linear_epochs: int = 15,
-        xgb_iters: int = 15,
+        iterations: int = 500,
+        learning_rate: float = 0.05,
+        depth: int = 6,
 ) -> dict[str, float]:
     version = version or datetime.now(UTC).strftime("%Y%m%d_%H%M")
     Path(local_data_dir).mkdir(parents=True, exist_ok=True)
@@ -147,15 +119,12 @@ def run(
     y = teams_expanded[["radiant_win"]]
     assert X.shape[1] == N_FEATURES, f"Ожидалось {N_FEATURES} фич, получено {X.shape[1]}"
 
-    from training.train_model import train_linear, train_xgb
+    from training.train_model import train_catboost
 
-    log.info("Обучение LinearModel (%d эпох)...", linear_epochs)
-    linear_model, X_tensor, y_tensor = train_linear(X, y, num_epochs=linear_epochs)
+    log.info("Обучение CatBoost (iterations=%d, lr=%s, depth=%d)....", iterations, learning_rate, depth)
+    model = train_catboost(X, y, iterations, learning_rate, depth)
 
-    log.info("Обучение XGBModule (%d итераций)...", xgb_iters)
-    xnet = train_xgb(X_tensor, y_tensor, len(X), N_FEATURES, iters=xgb_iters)
-
-    metrics = compute_metrics(linear_model, xnet, X_tensor, y_tensor)
+    metrics = compute_metrics(model, X, y)
     log.info("Метрики: %s", metrics)
 
     metrics_str = "  ".join(f"{k}={v}" for k, v in metrics.items())
@@ -164,8 +133,7 @@ def run(
     _gha_set_output("accuracy", str(metrics["accuracy"]))
     _gha_set_output("brier", str(metrics["brier"]))
 
-    torch.save(linear_model.state_dict(), f"{local_model_dir}/linear.pth")
-    torch.save(xnet.state_dict(), f"{local_model_dir}/xgb.pth")
+    model.save_model(f"{local_model_dir}/catboost.cbm")
     joblib.dump(artifacts, f"{local_model_dir}/artifacts.pkl")
     teams_expanded.to_parquet(f"{local_model_dir}/teams_expanded.parquet", index=False)
     log.info("Локально → %s/", local_model_dir)
@@ -176,8 +144,7 @@ def run(
             storage = get_storage()
             storage.save_model_version(
                 version=version,
-                linear_sd=linear_model.state_dict(),
-                xgb_sd=xnet.state_dict(),
+                cb_model=model,
                 artifacts=artifacts,
                 metrics=metrics,
             )
@@ -198,14 +165,14 @@ if __name__ == "__main__":
         format="%(asctime)s %(levelname)-8s %(name)s  %(message)s",
     )
     parser = argparse.ArgumentParser(description="Dota ML training pipeline")
-    parser.add_argument("--version", default=None)
-    parser.add_argument("--data-dir", default=os.getenv("LOCAL_DATA_DIR", "data"))
-    parser.add_argument("--model-dir", default=os.getenv("LOCAL_MODEL_DIR", "model"))
-    parser.add_argument("--no-s3", action="store_true")
-    parser.add_argument("--promote", action="store_true",
-                        help="Автоматически продвинуть в production после обучения")
-    parser.add_argument("--linear-epochs", type=int, default=15)
-    parser.add_argument("--xgb-iters", type=int, default=15)
+    parser.add_argument("--version",       default=None)
+    parser.add_argument("--data-dir",      default=os.getenv("LOCAL_DATA_DIR", "data"))
+    parser.add_argument("--model-dir",     default=os.getenv("LOCAL_MODEL_DIR", "model"))
+    parser.add_argument("--no-s3",         action="store_true")
+    parser.add_argument("--promote",       action="store_true")
+    parser.add_argument("--iterations",    type=int,   default=500)
+    parser.add_argument("--learning-rate", type=float, default=0.05)
+    parser.add_argument("--depth",         type=int,   default=6)
     args = parser.parse_args()
 
     metrics = run(
@@ -214,8 +181,9 @@ if __name__ == "__main__":
         local_model_dir=args.model_dir,
         use_s3=not args.no_s3,
         promote=args.promote,
-        linear_epochs=args.linear_epochs,
-        xgb_iters=args.xgb_iters,
+        iterations=args.iterations,
+        learning_rate=args.learning_rate,
+        depth=args.depth,
     )
     print(f"accuracy={metrics['accuracy']}")
     sys.exit(0)

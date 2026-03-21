@@ -9,17 +9,20 @@ from typing import Any
 import boto3
 import dotenv
 import joblib
-import torch
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
-dotenv.load_dotenv()
+try:
+    import dotenv
+    dotenv.load_dotenv()
+except ImportError:
+    pass
 
 log = logging.getLogger(__name__)
 
 _RAW_MATCHES  = "raw/matches/{date}.parquet"
 _RAW_PLAYERS  = "raw/players/{date}.parquet"
-_MODEL_LINEAR = "models/{version}/linear.pth"
-_MODEL_XGB    = "models/{version}/xgb.pth"
+_MODEL_CB = "models/{version}/catboost.cbm"
 _ARTIFACTS    = "models/{version}/artifacts.pkl"
 _META         = "models/{version}/meta.json"
 _PRODUCTION   = "models/production.json"
@@ -41,7 +44,8 @@ class S3Storage:
             kwargs["endpoint_url"] = endpoint_url
         if aws_access_key_id:
             kwargs["aws_access_key_id"] = aws_access_key_id
-            kwargs["aws_secret_access_ley"] = aws_secret_access_key
+            kwargs["aws_secret_access_key"] = aws_secret_access_key
+        kwargs["config"] = Config(signature_version="s3v4", request_checksum_calculation="when_required",  response_checksum_validation="when_required")
 
         self._s3 = boto3.client("s3", **kwargs)
         self._verify_bucket()
@@ -87,14 +91,32 @@ class S3Storage:
         buf = io.BytesIO(self._get(key))
         return joblib.load(buf)
 
-    def _put_torch(self, key: str, state_dict: dict) -> None:
-        buf = io.BytesIO()
-        torch.save(state_dict, buf)
-        self._put(key, buf.getvalue())
+    def _put_cbm(self, key: str, model) -> None:
+        import os
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix='.cbm', delete=False) as tmp:
+            tmp_path = tmp.name
+        try:
+            model.save_model(tmp_path)
+            with open(tmp_path, "rb") as f:
+                self._put(key, f.read())
+        finally:
+            os.unlink(tmp_path)
 
-    def _get_torch(self, key: str) -> dict:
-        buf = io.BytesIO(self._get(key))
-        return torch.load(buf, map_location="cpu", weights_only=False)
+    def _get_cbm(self, key: str):
+        import os
+        import tempfile
+
+        from catboost import CatBoostClassifier
+        with tempfile.NamedTemporaryFile(suffix='.cbm', delete=False) as tmp:
+            tmp.write(self._get(key))
+            tmp_path = tmp.name
+        try:
+            model = CatBoostClassifier()
+            model.load_model(tmp_path)
+        finally:
+            os.unlink(tmp_path)
+        return model
 
     def _put_json(self, key: str, obj: Any) -> None:
         self._put(key, json.dumps(obj, default=str).encode())
@@ -120,7 +142,7 @@ class S3Storage:
 
     def save_raw_players(self, df, date_tag: str) -> str:
         """Save raw player data to S3 as parquet file."""
-        key = _RAW_MATCHES.format(date=date_tag)
+        key = _RAW_PLAYERS.format(date=date_tag)
         self._put_parquet(key, df)
         log.info(f"S3 raw players -> {key}")
         return key
@@ -137,14 +159,12 @@ class S3Storage:
     def save_model_version(
             self,
             version: str,
-            linear_sd: dict,
-            xgb_sd: dict,
+            cb_model,
             artifacts: dict,
             metrics: dict,
     ) -> None:
         """Save a new model version to S3 with metadata."""
-        self._put_torch(_MODEL_LINEAR.format(version=version), linear_sd)
-        self._put_torch(_MODEL_XGB.format(version=version), xgb_sd)
+        self._put_cbm(_MODEL_CB.format(version=version), cb_model)
         self._put_pickle(_ARTIFACTS.format(version=version), artifacts)
 
         meta = {
@@ -214,20 +234,19 @@ class S3Storage:
                 pass
         return sorted(versions, key=lambda x: x.get("created_at", ""), reverse=True)
 
-    def load_model_version(self, version: str) -> tuple[dict, dict, dict]:
+    def load_model_version(self, version: str) -> tuple:
         """Load a specific model version from S3."""
-        linear_sd = self._get_torch(_MODEL_LINEAR.format(version=version))
-        xgb_sd = self._get_torch(_MODEL_XGB.format(version=version))
+        cb_model = self._get_cbm(_MODEL_CB.format(version=version))
         artifacts = self._get_pickle(_ARTIFACTS.format(version=version))
-        return linear_sd, xgb_sd, artifacts
+        return cb_model, artifacts
 
-    def load_production_model(self) -> tuple[dict, dict, dict, str]:
+    def load_production_model(self) -> tuple:
         """Load the current production model version."""
         version = self.get_production_version()
         if version is None:
             raise RuntimeError("Нет production-версии в S3")
-        linear_sd, xgb_sd, artifacts = self.load_model_version(version)
-        return linear_sd, xgb_sd, artifacts, version
+        cb_model, artifacts = self.load_model_version(version)
+        return cb_model, artifacts, version
 
 _instance: S3Storage | None = None
 
